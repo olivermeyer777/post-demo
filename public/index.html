@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unblu Agent Demo</title>
+  <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
+  <style>
+    :root { --yellow: #ffc72c; --yellow-dark: #e1ae1f; --blue-light: #e4f3fb; --blue-text: #003350; --bg: #f5f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--blue-text); display: flex; flex-direction: column; min-height: 100vh; }
+    header { background: var(--yellow); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+    .header-left { display: flex; gap: 10px; align-items: center; font-weight: 600; }
+    .logo-box { width: 32px; height: 32px; border: 2px solid #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 32px 24px 80px; }
+    h1 { margin: 40px 0 24px; font-size: clamp(26px, 3vw, 32px); }
+    .actions { width: 100%; max-width: 1100px; display: flex; gap: 12px; flex-wrap: wrap; margin: 32px auto 16px; }
+    .action-button { flex: 1 1 260px; background: var(--yellow); border: none; border-radius: 4px; padding: 18px 16px; font-size: 18px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; }
+    .action-button:hover { background: var(--yellow-dark); transform: translateY(-1px); }
+    .info-banner { width: 100%; max-width: 1100px; background: var(--blue-light); padding: 16px 20px; border-radius: 4px; margin-top: 16px; text-align: center; font-size: 18px; }
+    .info-banner small { display: block; margin-top: 4px; opacity: 0.8; }
+    .chat-section { width: 100%; max-width: 520px; margin: 32px auto 0; }
+    #chat-root { width: 100%; height: 480px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 0 24px rgba(0,0,0,0.12); }
+    .mic-button { position: fixed; right: 24px; bottom: 80px; width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--yellow); display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.25); transition: 0.15s; z-index: 20; }
+    .mic-button:hover { background: var(--yellow-dark); transform: translateY(-1px); }
+    footer { position: fixed; left: 0; right: 0; bottom: 10px; display: flex; justify-content: space-between; padding: 0 16px; pointer-events: none; }
+    .languages, .footer-right { pointer-events: auto; display: flex; gap: 6px; }
+    .lang-button, .footer-pill { border: 1px solid #ddd; padding: 4px 10px; border-radius: 14px; background: #fff; font-size: 11px; cursor: pointer; }
+    .lang-button.active { background: #fff9e0; border-color: var(--yellow-dark); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="logo-box">P</div>
+      <div>Info-Assistent</div>
+    </div>
+    <div class="header-right" style="font-size:12px; opacity:.8;">Demo-Oberfläche</div>
+  </header>
+  <main>
+    <h1>Willkommen bei der Schweizerischen Post!</h1>
+    <div class="actions">
+      <button class="action-button">📦 Paket frankieren</button>
+      <button class="action-button">✉️ Brief versenden</button>
+      <button class="action-button">🧾 Rechnung bezahlen (nur mit Karte)</button>
+    </div>
+    <div class="info-banner">
+      Kann ich Ihnen anderweitig helfen oder haben Sie Fragen?
+      <small>Hier kommen Sie zu einer Beratungsperson.</small>
+    </div>
+    <div class="chat-section">
+      <div id="chat-root"></div>
+    </div>
+  </main>
+  <button class="mic-button">🎤</button>
+  <footer>
+    <div class="languages">
+      <button class="lang-button active">Deutsch</button>
+      <button class="lang-button">Français</button>
+      <button class="lang-button">Italiano</button>
+      <button class="lang-button">English</button>
+    </div>
+    <div class="footer-right">
+      <div class="footer-pill">Live Beratung</div>
+      <div class="footer-pill">Zugänglichkeit</div>
+    </div>
+  </footer>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const root = document.getElementById("chat-root");
+
+      function setupWidget() {
+        if (!root) {
+          console.error("chat-root Element wurde nicht gefunden.");
+          return;
+        }
+
+        root.innerHTML = "";
+
+        const widget = document.createElement("openai-chatkit");
+        root.appendChild(widget);
+
+        if (typeof widget.setOptions === "function") {
+          widget.setOptions({
+            api: {
+              async getClientSecret() {
+                const r = await fetch("/api/chatkit-session", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ user: "local-demo-user" })
+                });
+                const data = await r.json();
+                return data.client_secret;
+              }
+            }
+          });
+        } else {
+          console.warn(
+            "openai-chatkit.setOptions() ist nicht verfügbar. " +
+            "Bitte prüfe, ob die Chatkit-Bibliothek korrekt geladen ist und welches Integrations-API sie bereitstellt."
+          );
+        }
+      }
+
+      if (window.customElements && window.customElements.whenDefined) {
+        window.customElements
+          .whenDefined("openai-chatkit")
+          .then(setupWidget)
+          .catch((err) => {
+            console.error("Fehler beim Initialisieren des Chat-Widgets:", err);
+          });
+      } else {
+        setupWidget();
+      }
+    });
+  </script>
+</body>
+</html>
