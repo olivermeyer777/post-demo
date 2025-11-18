@@ -79,7 +79,11 @@
       border-top: 10px solid #fff;
     }
 
-    /* Layout mit zentrierten Kacheln */
+    .hidden {
+      display: none !important;
+    }
+
+    /* HOME VIEW: zentrierte Kacheln */
     .main-layout {
       display: flex;
       justify-content: center;
@@ -111,7 +115,7 @@
       justify-content: center;   /* vertikal zentriert */
       align-items: center;       /* horizontal zentriert */
       text-align: center;
-      min-height: 400px;         /* hohe Kacheln (ca. doppelt) */
+      min-height: 400px;         /* hohe Kacheln */
     }
 
     .tile-title {
@@ -155,11 +159,85 @@
       box-shadow: none;
     }
 
-    /* Chat-Box als Overlay unten rechts */
+    /* ORAKEL VIEW */
+    .orakel-view {
+      margin-top: 32px;
+    }
+
+    .orakel-title {
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .orakel-subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 28px;
+    }
+
+    .orakel-buttons-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      padding: 24px 20px;
+    }
+
+    .orakel-buttons-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+      min-height: 80px;
+    }
+
+    .orakel-option-btn {
+      border-radius: 999px;
+      border: 1px solid #111;
+      padding: 8px 16px;
+      font-size: 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease, transform 0.08s ease;
+      white-space: nowrap;
+    }
+
+    .orakel-option-btn:hover {
+      background: #111;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .orakel-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .orakel-nav-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* Chat-Box nur im Orakel-Prozess */
     .chat-box {
       position: fixed;
       right: 18px;
-      bottom: 80px; /* über der Sprachleiste / Toggle */
+      bottom: 80px; /* über Sprachleiste / Toggle */
       width: 360px;
       max-width: calc(100% - 32px);
       background: #fff;
@@ -271,7 +349,7 @@
       cursor: default;
     }
 
-    /* Chat bubble toggle (bottom right) */
+    /* Chat bubble toggle (unten rechts) */
     .chat-toggle {
       position: fixed;
       right: 18px;
@@ -333,6 +411,10 @@
       .tile {
         min-height: 220px;
       }
+
+      .orakel-buttons-wrapper {
+        padding: 18px 14px;
+      }
     }
 
     /* Auf kleineren Screens: Beschreibungen ausblenden, nur Titel + Button */
@@ -356,409 +438,13 @@
   </header>
 
   <main class="page-wrapper">
-    <section class="hero">
-      <h1 class="hero-title" id="page-title">Willkommen bei der Post!</h1>
-      <div class="hero-pointer"></div>
-    </section>
+    <!-- HOME VIEW -->
+    <section id="home-view">
+      <section class="hero">
+        <h1 class="hero-title" id="page-title">Willkommen bei der Post!</h1>
+        <div class="hero-pointer"></div>
+      </section>
 
-    <section class="main-layout">
-      <!-- ZENTRIERTE KACHELN -->
-      <div class="tiles-column">
-        <!-- Orakel -->
-        <article class="tile">
-          <div>
-            <h2 class="tile-title" id="tile-orakel-title">Orakel</h2>
-            <p class="tile-desc" id="tile-orakel-desc">
-              Stelle dem Orakel deine Frage rund um die Post – der Assistent
-              schlägt dir passende Antworten und nächste Schritte vor.
-            </p>
-          </div>
-          <button class="tile-btn" id="tile-orakel-btn">
-            <span id="tile-orakel-btn-text">Bedienung starten</span>
-          </button>
-        </article>
-
-        <!-- Self-Service -->
-        <article class="tile">
-          <div>
-            <h2 class="tile-title" id="tile-self-title">Self-Service</h2>
-            <p class="tile-desc" id="tile-self-desc">
-              Finde Schritt für Schritt die richtige Self-Service-Lösung:
-              Sendungsverfolgung, Umzug melden, Abholaufträge und mehr.
-            </p>
-          </div>
-          <button class="tile-btn" id="tile-self-btn">
-            <span id="tile-self-btn-text">Self-Service starten</span>
-          </button>
-        </article>
-
-        <!-- Video-Bedienung -->
-        <article class="tile">
-          <div>
-            <h2 class="tile-title" id="tile-video-title">Video-Bedienung</h2>
-            <p class="tile-desc" id="tile-video-desc">
-              Sprich live mit einer Mitarbeitenden der Post per Video-Beratung –
-              ideal bei komplexeren Anliegen.
-            </p>
-          </div>
-          <button class="tile-btn" id="tile-video-btn">
-            <span id="tile-video-btn-text">Video-Bedienung starten</span>
-          </button>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <!-- Chat-Overlay (default: minimiert) -->
-  <div class="chat-box minimized" id="chat-box">
-    <div class="chat-header">
-      <div class="chat-header-left">
-        <div class="chat-status-dot"></div>
-        <span id="chat-header-title">Chat-Assistent</span>
-      </div>
-      <button class="chat-minimize-btn" id="chat-minimize" aria-label="Chat minimieren">
-        &minus;
-      </button>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <form class="chat-form" id="chat-form">
-      <input
-        id="chat-input"
-        class="chat-input"
-        type="text"
-        autocomplete="off"
-        placeholder="Schreibe deine Frage…"
-      />
-      <button type="submit" class="chat-send-btn" id="chat-send-btn">
-        <span id="chat-send-label">Senden</span>
-      </button>
-    </form>
-  </div>
-
-  <!-- Chat toggle bubble -->
-  <button class="chat-toggle" id="chat-toggle" aria-label="Chat öffnen oder schliessen">
-    💬
-  </button>
-
-  <!-- Language buttons -->
-  <div class="language-bar">
-    <button class="lang-btn active" data-lang="de">
-      <span class="lang-dot">🌐</span><span>Deutsch</span>
-    </button>
-    <button class="lang-btn" data-lang="fr">
-      <span class="lang-dot">🌐</span><span>Français</span>
-    </button>
-    <button class="lang-btn" data-lang="it">
-      <span class="lang-dot">🌐</span><span>Italiano</span>
-    </button>
-    <button class="lang-btn" data-lang="en">
-      <span class="lang-dot">🌐</span><span>English</span>
-    </button>
-    <button class="lang-btn" data-lang="es">
-      <span class="lang-dot">🌐</span><span>Español</span>
-    </button>
-    <button class="lang-btn" data-lang="pt">
-      <span class="lang-dot">🌐</span><span>Português</span>
-    </button>
-  </div>
-
-  <script>
-    /**************************************
-     * 1) OPENAI / AGENT SETTINGS
-     **************************************/
-
-    // TODO: Domain Project Key einsetzen
-    const OPENAI_PUBLIC_KEY = "YOUR_DOMAIN_PUBLIC_KEY_HERE";
-
-    // TODO: Agent-ID aus Agent Builder
-    const OPENAI_AGENT_ID = "YOUR_AGENT_ID_HERE";
-
-    async function sendMessageToOpenAI(message) {
-      if (!OPENAI_PUBLIC_KEY || OPENAI_PUBLIC_KEY.startsWith("YOUR_")) {
-        return "Der Prototyp ist noch nicht mit der OpenAI-API verbunden. Bitte trage deinen Domain-Schlüssel im Code ein.";
-      }
-
-      try {
-        const response = await fetch("https://api.openai.com/v1/responses", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + OPENAI_PUBLIC_KEY,
-            "OpenAI-Beta": "agents=v1"
-          },
-          body: JSON.stringify({
-            agent_id: OPENAI_AGENT_ID,
-            input: message
-          })
-        });
-
-        if (!response.ok) {
-          console.error("OpenAI error", await response.text());
-          return "Es ist ein Fehler beim Aufruf des Assistenten aufgetreten.";
-        }
-
-        const data = await response.json();
-        const text =
-          data.output?.[0]?.content?.[0]?.text?.value ||
-          "Ich konnte leider keine Antwort vom Assistenten lesen.";
-        return text;
-      } catch (err) {
-        console.error(err);
-        return "Die Verbindung zum Assistenten ist fehlgeschlagen.";
-      }
-    }
-
-    /**************************************
-     * 2) CHAT UI LOGIK
-     **************************************/
-
-    const chatBox = document.getElementById("chat-box");
-    const chatToggleBtn = document.getElementById("chat-toggle");
-    const minimizeBtn = document.getElementById("chat-minimize");
-    const chatMessages = document.getElementById("chat-messages");
-    const chatForm = document.getElementById("chat-form");
-    const chatInput = document.getElementById("chat-input");
-    const chatSendBtn = document.getElementById("chat-send-btn");
-
-    function addMessage(text, sender) {
-      const div = document.createElement("div");
-      div.classList.add("chat-message", sender);
-      div.textContent = text;
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // Begrüssung (wird erst sichtbar, wenn Chat geöffnet ist)
-    addMessage(
-      "Hallo! Ich bin dein Assistent der Schweizer Post. Wie kann ich dir helfen?",
-      "assistant"
-    );
-
-    chatForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const value = chatInput.value.trim();
-      if (!value) return;
-
-      addMessage(value, "user");
-      chatInput.value = "";
-      chatInput.focus();
-
-      chatSendBtn.disabled = true;
-
-      const thinkingMsg = document.createElement("div");
-      thinkingMsg.classList.add("chat-message", "assistant");
-      thinkingMsg.textContent = "Denke nach…";
-      chatMessages.appendChild(thinkingMsg);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      const reply = await sendMessageToOpenAI(value);
-
-      thinkingMsg.remove();
-      addMessage(reply, "assistant");
-      chatSendBtn.disabled = false;
-    });
-
-    chatToggleBtn.addEventListener("click", () => {
-      chatBox.classList.toggle("minimized");
-    });
-
-    minimizeBtn.addEventListener("click", () => {
-      chatBox.classList.add("minimized");
-    });
-
-    /**************************************
-     * 3) TILE BUTTON HANDLER (DEMO)
-     **************************************/
-
-    document.getElementById("tile-orakel-btn").addEventListener("click", () => {
-      addMessage("Du hast das Orakel geöffnet. Stelle deine Frage im Chat.", "assistant");
-      chatBox.classList.remove("minimized");
-    });
-
-    document.getElementById("tile-self-btn").addEventListener("click", () => {
-      addMessage(
-        "Self-Service: Beschreibe kurz dein Anliegen, ich führe dich durch die passenden Online-Services.",
-        "assistant"
-      );
-      chatBox.classList.remove("minimized");
-    });
-
-    document.getElementById("tile-video-btn").addEventListener("click", () => {
-      addMessage(
-        "Video-Bedienung ist in diesem Prototyp noch nicht aktiv. Hier könnte der Link zu einem Video-Call oder einer Warteschlange erscheinen.",
-        "assistant"
-      );
-      chatBox.classList.remove("minimized");
-    });
-
-    /**************************************
-     * 4) SPRACHWECHSEL
-     **************************************/
-
-    const translations = {
-      de: {
-        topTitle: "Info Assistant",
-        pageTitle: "Willkommen bei der Post!",
-        chatHeaderTitle: "Chat-Assistent",
-        chatPlaceholder: "Schreibe deine Frage…",
-        chatSendLabel: "Senden",
-        tiles: {
-          orakelTitle: "Orakel",
-          orakelDesc:
-            "Stelle dem Orakel deine Frage rund um die Post – der Assistent schlägt dir passende Antworten und nächste Schritte vor.",
-          orakelButton: "Bedienung starten",
-          selfTitle: "Self-Service",
-          selfDesc:
-            "Finde Schritt für Schritt die richtige Self-Service-Lösung: Sendungsverfolgung, Umzug melden, Abholaufträge und mehr.",
-          selfButton: "Self-Service starten",
-          videoTitle: "Video-Bedienung",
-          videoDesc:
-            "Sprich live mit einer Mitarbeitenden der Post per Video-Beratung – ideal bei komplexeren Anliegen.",
-          videoButton: "Video-Bedienung starten"
-        }
-      },
-      fr: {
-        topTitle: "Assistant d’information",
-        pageTitle: "Bienvenue à la Poste!",
-        chatHeaderTitle: "Assistant de chat",
-        chatPlaceholder: "Écrivez votre question…",
-        chatSendLabel: "Envoyer",
-        tiles: {
-          orakelTitle: "Oracle",
-          orakelDesc:
-            "Posez votre question à l’Oracle au sujet de la Poste – l’assistant vous propose des réponses et les prochaines étapes.",
-          orakelButton: "Démarrer",
-          selfTitle: "Self-Service",
-          selfDesc:
-            "Trouvez pas à pas la bonne solution en libre-service : suivi des envois, annonce de déménagement, ordres de retrait, etc.",
-          selfButton: "Lancer le self-service",
-          videoTitle: "Assistance vidéo",
-          videoDesc:
-            "Parlez en direct avec une collaboratrice ou un collaborateur de la Poste par assistance vidéo – idéal pour les demandes complexes.",
-          videoButton: "Démarrer l’assistance vidéo"
-        }
-      },
-      it: {
-        topTitle: "Assistente informazioni",
-        pageTitle: "Benvenuti alla Posta!",
-        chatHeaderTitle: "Assistente chat",
-        chatPlaceholder: "Scrivi la tua domanda…",
-        chatSendLabel: "Invia",
-        tiles: {
-          orakelTitle: "Oracolo",
-          orakelDesc:
-            "Poni la tua domanda sull’ufficio postale all’Oracolo – l’assistente ti suggerisce risposte e passi successivi.",
-          orakelButton: "Avvia assistenza",
-          selfTitle: "Self-Service",
-          selfDesc:
-            "Trova passo dopo passo la soluzione self-service giusta: tracciamento invii, notifica di trasferimento, ordini di ritiro e altro.",
-          selfButton: "Avvia self-service",
-          videoTitle: "Assistenza video",
-          videoDesc:
-            "Parla in diretta con una collaboratrice o un collaboratore della Posta tramite consulenza video – ideale per richieste complesse.",
-          videoButton: "Avvia assistenza video"
-        }
-      },
-      en: {
-        topTitle: "Info Assistant",
-        pageTitle: "Welcome to Swiss Post!",
-        chatHeaderTitle: "Chat Assistant",
-        chatPlaceholder: "Type your question…",
-        chatSendLabel: "Send",
-        tiles: {
-          orakelTitle: "Oracle",
-          orakelDesc:
-            "Ask the Oracle your question about Swiss Post – the assistant suggests answers and next steps.",
-          orakelButton: "Start service",
-          selfTitle: "Self-Service",
-          selfDesc:
-            "Step by step to the right self-service solution: track & trace, change of address, pick-up orders and more.",
-          selfButton: "Start self-service",
-          videoTitle: "Video Service",
-          videoDesc:
-            "Talk live to a Swiss Post staff member via video – ideal for more complex requests.",
-          videoButton: "Start video service"
-        }
-      },
-      es: {
-        topTitle: "Asistente de información",
-        pageTitle: "¡Bienvenido a Correos!",
-        chatHeaderTitle: "Asistente de chat",
-        chatPlaceholder: "Escribe tu pregunta…",
-        chatSendLabel: "Enviar",
-        tiles: {
-          orakelTitle: "Oráculo",
-          orakelDesc:
-            "Haz tu pregunta sobre Correos al Oráculo: el asistente te sugiere respuestas y próximos pasos.",
-          orakelButton: "Iniciar atención",
-          selfTitle: "Autoservicio",
-          selfDesc:
-            "Encuentra paso a paso la solución de autoservicio adecuada: seguimiento de envíos, cambio de dirección, órdenes de recogida y más.",
-          selfButton: "Iniciar autoservicio",
-          videoTitle: "Atención por vídeo",
-          videoDesc:
-            "Habla en directo con una persona de Correos por videollamada; ideal para consultas complejas.",
-          videoButton: "Iniciar atención por vídeo"
-        }
-      },
-      pt: {
-        topTitle: "Assistente de informações",
-        pageTitle: "Bem-vindo ao Correio!",
-        chatHeaderTitle: "Assistente de chat",
-        chatPlaceholder: "Escreva a sua pergunta…",
-        chatSendLabel: "Enviar",
-        tiles: {
-          orakelTitle: "Oráculo",
-          orakelDesc:
-            "Faça sua pergunta sobre o correio ao Oráculo – o assistente sugere respostas e próximos passos.",
-          orakelButton: "Iniciar atendimento",
-          selfTitle: "Self-Service",
-          selfDesc:
-            "Encontre passo a passo a solução certa em self-service: rastreamento de envios, mudança de endereço, pedidos de recolha e muito mais.",
-          selfButton: "Iniciar self-service",
-          videoTitle: "Atendimento por vídeo",
-          videoDesc:
-            "Fale ao vivo com uma colaboradora ou um colaborador do correio por vídeo – ideal para pedidos mais complexos.",
-          videoButton: "Iniciar atendimento por vídeo"
-        }
-      }
-    };
-
-    function setLanguage(lang) {
-      const t = translations[lang] || translations.de;
-
-      document.documentElement.lang = lang;
-      document.getElementById("top-title").textContent = t.topTitle;
-      document.getElementById("page-title").textContent = t.pageTitle;
-      document.getElementById("chat-header-title").textContent = t.chatHeaderTitle;
-      document.getElementById("chat-input").placeholder = t.chatPlaceholder;
-      document.getElementById("chat-send-label").textContent = t.chatSendLabel;
-
-      document.getElementById("tile-orakel-title").textContent = t.tiles.orakelTitle;
-      document.getElementById("tile-orakel-desc").textContent = t.tiles.orakelDesc;
-      document.getElementById("tile-orakel-btn-text").textContent = t.tiles.orakelButton;
-
-      document.getElementById("tile-self-title").textContent = t.tiles.selfTitle;
-      document.getElementById("tile-self-desc").textContent = t.tiles.selfDesc;
-      document.getElementById("tile-self-btn-text").textContent = t.tiles.selfButton;
-
-      document.getElementById("tile-video-title").textContent = t.tiles.videoTitle;
-      document.getElementById("tile-video-desc").textContent = t.tiles.videoDesc;
-      document.getElementById("tile-video-btn-text").textContent = t.tiles.videoButton;
-
-      document
-        .querySelectorAll(".lang-btn")
-        .forEach((btn) => btn.classList.toggle("active", btn.dataset.lang === lang));
-    }
-
-    document.querySelectorAll(".lang-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        setLanguage(btn.dataset.lang);
-      });
-    });
-
-    // Default language
-    setLanguage("de");
-  </script>
-</body>
-</html>
+      <section class="main-layout">
+        <div class="tiles-column">
+          <!-- Orakel -->
