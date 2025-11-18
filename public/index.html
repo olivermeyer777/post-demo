@@ -79,19 +79,20 @@
       border-top: 10px solid #fff;
     }
 
+    /* Layout mit zentrierten Kacheln */
     .main-layout {
       display: flex;
-      gap: 24px;
+      justify-content: center;
       align-items: flex-start;
     }
 
     .tiles-column {
-      flex: 2;
       display: grid;
       grid-template-columns: repeat(1, minmax(0, 1fr));
       gap: 18px;
       max-width: 900px;
-      margin: 0 auto; /* zentriert die Kachel-Spalte im verfügbaren Bereich */
+      width: 100%;
+      margin: 0 auto;
     }
 
     @media (min-width: 900px) {
@@ -107,10 +108,10 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.03);
       display: flex;
       flex-direction: column;
-      justify-content: center;   /* Inhalt vertikal zentriert */
-      align-items: center;       /* Inhalt horizontal zentriert */
+      justify-content: center;   /* vertikal zentriert */
+      align-items: center;       /* horizontal zentriert */
       text-align: center;
-      min-height: 400px;         /* ungefähr doppelte Höhe */
+      min-height: 400px;         /* hohe Kacheln (ca. doppelt) */
     }
 
     .tile-title {
@@ -154,23 +155,22 @@
       box-shadow: none;
     }
 
-    .chat-column {
-      flex: 1.1;
-      position: relative;
-    }
-
-    /* Chat container (floating style) */
+    /* Chat-Box als Overlay unten rechts */
     .chat-box {
-      position: sticky;
-      top: 0;
+      position: fixed;
+      right: 18px;
+      bottom: 80px; /* über der Sprachleiste / Toggle */
+      width: 360px;
+      max-width: calc(100% - 32px);
       background: #fff;
       border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      min-height: 340px;
+      min-height: 320px;
       max-height: 520px;
+      z-index: 998;
     }
 
     .chat-header {
@@ -330,20 +330,6 @@
 
     /* Mobile & Tablet Anpassungen */
     @media (max-width: 900px) {
-      .main-layout {
-        flex-direction: column;
-      }
-
-      .chat-column {
-        width: 100%;
-      }
-
-      .chat-box {
-        position: static;
-        max-height: 380px;
-      }
-
-      /* Kacheln etwas kleiner auf Mobile/Tablet */
       .tile {
         min-height: 220px;
       }
@@ -353,6 +339,12 @@
     @media (max-width: 600px) {
       .tile-desc {
         display: none;
+      }
+
+      .chat-box {
+        right: 8px;
+        left: 8px;
+        width: auto;
       }
     }
   </style>
@@ -370,7 +362,7 @@
     </section>
 
     <section class="main-layout">
-      <!-- LEFT: TILES -->
+      <!-- ZENTRIERTE KACHELN -->
       <div class="tiles-column">
         <!-- Orakel -->
         <article class="tile">
@@ -414,36 +406,34 @@
           </button>
         </article>
       </div>
-
-      <!-- RIGHT: CHAT -->
-      <aside class="chat-column">
-        <div class="chat-box" id="chat-box">
-          <div class="chat-header">
-            <div class="chat-header-left">
-              <div class="chat-status-dot"></div>
-              <span id="chat-header-title">Chat-Assistent</span>
-            </div>
-            <button class="chat-minimize-btn" id="chat-minimize" aria-label="Chat minimieren">
-              &minus;
-            </button>
-          </div>
-          <div class="chat-messages" id="chat-messages"></div>
-          <form class="chat-form" id="chat-form">
-            <input
-              id="chat-input"
-              class="chat-input"
-              type="text"
-              autocomplete="off"
-              placeholder="Schreibe deine Frage…"
-            />
-            <button type="submit" class="chat-send-btn" id="chat-send-btn">
-              <span id="chat-send-label">Senden</span>
-            </button>
-          </form>
-        </div>
-      </aside>
     </section>
   </main>
+
+  <!-- Chat-Overlay (default: minimiert) -->
+  <div class="chat-box minimized" id="chat-box">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="chat-status-dot"></div>
+        <span id="chat-header-title">Chat-Assistent</span>
+      </div>
+      <button class="chat-minimize-btn" id="chat-minimize" aria-label="Chat minimieren">
+        &minus;
+      </button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <form class="chat-form" id="chat-form">
+      <input
+        id="chat-input"
+        class="chat-input"
+        type="text"
+        autocomplete="off"
+        placeholder="Schreibe deine Frage…"
+      />
+      <button type="submit" class="chat-send-btn" id="chat-send-btn">
+        <span id="chat-send-label">Senden</span>
+      </button>
+    </form>
+  </div>
 
   <!-- Chat toggle bubble -->
   <button class="chat-toggle" id="chat-toggle" aria-label="Chat öffnen oder schliessen">
@@ -538,7 +528,7 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Begrüssung
+    // Begrüssung (wird erst sichtbar, wenn Chat geöffnet ist)
     addMessage(
       "Hallo! Ich bin dein Assistent der Schweizer Post. Wie kann ich dir helfen?",
       "assistant"
