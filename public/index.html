@@ -2,12 +2,9 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <title>Post Chat Assistent</title>
+    <title>Post Self-Service & Chat Assistent</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- ============================= -->
-    <!--        POST CHAT STYLES       -->
-    <!-- ============================= -->
     <style>
       :root {
         --post-yellow: #ffcc00;
@@ -19,14 +16,246 @@
         --post-shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.12);
       }
 
-      body {
-        font-family: Arial, sans-serif;
-        background: #ffffff;
-        margin: 0;
-        padding: 0;
+      * {
+        box-sizing: border-box;
       }
 
-      /* Floating Toggle Button */
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          system-ui, sans-serif;
+        background: #ffffff;
+        color: #111111;
+      }
+
+      /* ---------- Hauptseite / Layout ---------- */
+
+      .page-shell {
+        min-height: 100vh;
+        padding: 32px 20px 96px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+
+      .page-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .page-logo-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: var(--post-yellow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 20px;
+        color: var(--post-dark);
+      }
+
+      .page-title-block {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      .page-subtitle {
+        font-size: 13px;
+        color: #666666;
+      }
+
+      .page-tagline {
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid #f0f0f0;
+        font-size: 12px;
+        background: #fafafa;
+      }
+
+      .hero {
+        margin-bottom: 28px;
+      }
+
+      .hero-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .hero-highlight {
+        background: linear-gradient(
+          120deg,
+          rgba(255, 204, 0, 0.4),
+          rgba(255, 255, 255, 0)
+        );
+        border-radius: 12px;
+        padding: 4px 8px;
+      }
+
+      .hero-text {
+        font-size: 14px;
+        color: #555555;
+        max-width: 520px;
+      }
+
+      /* ---------- Use-Case Grid ---------- */
+
+      .usecase-section-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .usecase-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+
+      .usecase-card {
+        border-radius: 18px;
+        border: 1px solid #f0f0f0;
+        background: #ffffff;
+        padding: 14px 14px 12px;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.02);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: transform 0.12s ease, box-shadow 0.12s ease,
+          border-color 0.12s ease;
+        cursor: pointer;
+      }
+
+      .usecase-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--post-yellow);
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.04);
+      }
+
+      .usecase-header {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .usecase-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: #fff7d6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+
+      .usecase-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .usecase-badge {
+        font-size: 11px;
+        color: #777777;
+      }
+
+      .usecase-text {
+        font-size: 12px;
+        color: #555555;
+      }
+
+      .usecase-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 4px;
+        gap: 6px;
+      }
+
+      .btn-primary {
+        border-radius: 999px;
+        border: none;
+        padding: 6px 12px;
+        background: #111111;
+        color: #ffffff;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .btn-primary span {
+        margin-left: 4px;
+      }
+
+      .btn-chat {
+        border-radius: 999px;
+        border: none;
+        padding: 6px 10px;
+        background: #fff7d6;
+        color: #a06b00;
+        font-size: 11px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .btn-chat-emoji {
+        font-size: 13px;
+      }
+
+      /* ---------- Detail / Self-Service Panel ---------- */
+
+      .detail-panel {
+        margin-top: 6px;
+        padding: 14px 14px 16px;
+        border-radius: 18px;
+        border: 1px dashed #e0e0e0;
+        background: #fdfdfd;
+      }
+
+      .detail-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .detail-text {
+        font-size: 12px;
+        color: #555555;
+        margin-bottom: 10px;
+      }
+
+      .detail-steps {
+        font-size: 12px;
+        padding-left: 18px;
+        margin: 0;
+        color: #444444;
+      }
+
+      .detail-hint {
+        font-size: 11px;
+        color: #777777;
+        margin-top: 8px;
+      }
+
+      /* ---------- Chat Overlay ---------- */
+
       .post-chat-toggle-btn {
         position: fixed;
         right: 24px;
@@ -43,7 +272,6 @@
         z-index: 9999;
       }
 
-      /* Overlay */
       .post-chat-overlay {
         position: fixed;
         right: 24px;
@@ -55,14 +283,23 @@
         background: var(--post-bg);
         border-radius: var(--post-radius-xl);
         box-shadow: var(--post-shadow-soft);
-        display: flex;
+        display: none; /* initial hidden, JS zeigt es bei Bedarf */
         flex-direction: column;
         border: 1px solid var(--post-border);
         overflow: hidden;
         z-index: 10000;
       }
 
-      /* Header */
+      .post-chat-overlay.minimized {
+        height: auto;
+      }
+
+      .post-chat-overlay.minimized .post-chat-flow-bar,
+      .post-chat-overlay.minimized .post-chat-messages,
+      .post-chat-overlay.minimized .post-chat-input-row {
+        display: none;
+      }
+
       .post-chat-header {
         display: flex;
         align-items: center;
@@ -102,7 +339,6 @@
       .post-chat-title {
         font-size: 14px;
         font-weight: 700;
-        color: var(--post-dark);
       }
 
       .post-chat-subtitle {
@@ -124,46 +360,38 @@
         background: #ffffff;
       }
 
-      .post-chat-mic-btn {
-        width: 32px;
-        height: 32px;
+      .post-chat-mic-btn,
+      .post-chat-minimize-btn,
+      .post-chat-close-btn,
+      .post-chat-tts-btn {
+        width: 28px;
+        height: 28px;
         border-radius: 999px;
         border: none;
-        font-size: 18px;
+        font-size: 16px;
         cursor: pointer;
-        background: var(--post-dark);
-        color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-
-      .post-chat-mic-off {
-        background: #a00000;
-      }
-
-      .post-chat-tts-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
         background: #f5f5f5;
+      }
+
+      .post-chat-mic-btn {
+        background: #a00000;
+        color: #ffffff;
+        font-size: 17px;
+      }
+
+      .post-chat-mic-btn.on {
+        background: var(--post-dark);
       }
 
       .post-chat-tts-btn.on {
         background: var(--post-yellow);
       }
 
-      .post-chat-close-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 999px;
-        border: none;
-        cursor: pointer;
-        background: transparent;
-        font-size: 14px;
+      .post-chat-minimize-btn {
+        font-size: 18px;
       }
 
       .post-chat-flow-bar {
@@ -204,6 +432,12 @@
 
       .post-chat-message-assistant {
         justify-content: flex-start;
+      }
+
+      .post-chat-message-system {
+        justify-content: center;
+        font-size: 11px;
+        color: #777777;
       }
 
       .post-chat-avatar {
@@ -264,37 +498,233 @@
         color: var(--post-dark);
         font-size: 16px;
       }
+
+      .post-chat-toggle-btn {
+        display: none; /* Chat initial offen, willst du nur Icon -> hier auf block setzen */
+      }
+
+      @media (max-width: 640px) {
+        .page-shell {
+          padding: 20px 16px 96px;
+        }
+        .post-chat-overlay {
+          right: 12px;
+          left: 12px;
+          width: auto;
+        }
+        .post-chat-toggle-btn {
+          right: 16px;
+          bottom: 16px;
+        }
+      }
     </style>
   </head>
 
   <body>
-    <!-- Dein bestehendes HTML bleibt oben bestehen -->
-    <h1 style="padding: 20px;">Deine Seite + Post Chat Widget</h1>
+    <div class="page-shell">
+      <!-- Header / Branding -->
+      <header class="page-header">
+        <div class="page-brand">
+          <div class="page-logo-circle">P</div>
+          <div class="page-title-block">
+            <div class="page-title">Post Self-Service</div>
+            <div class="page-subtitle">
+              Alles rund um Briefe, Pakete &amp; Zustellung.
+            </div>
+          </div>
+        </div>
+        <div class="page-tagline">Self-Service oder Chat – du entscheidest.</div>
+      </header>
 
-    <!-- ================================================= -->
-    <!--             POST CHAT HTML STRUCTURE              -->
-    <!-- ================================================= -->
+      <!-- Hero Text -->
+      <section class="hero">
+        <div class="hero-title">
+          Deine Post-Anliegen,
+          <span class="hero-highlight">in wenigen Klicks oder im Chat gelöst.</span>
+        </div>
+        <p class="hero-text">
+          Wähle einen Bereich aus, um Schritt für Schritt durch den Self-Service
+          geführt zu werden – oder wechsle jederzeit in den Chat und lass dir
+          vom Assistenten helfen.
+        </p>
+      </section>
+
+      <!-- Use Case Grid -->
+      <section>
+        <div class="usecase-section-title">Was möchtest du erledigen?</div>
+        <div class="usecase-grid">
+          <!-- Brief versenden -->
+          <article
+            class="usecase-card"
+            data-usecase-id="brief"
+          >
+            <div class="usecase-header">
+              <div class="usecase-icon">✉️</div>
+              <div>
+                <div class="usecase-title">Brief versenden</div>
+                <div class="usecase-badge">Inland & Ausland</div>
+              </div>
+            </div>
+            <p class="usecase-text">
+              Finde das passende Format, Porto und die optimale Einwurf-Option
+              für deinen Brief.
+            </p>
+            <div class="usecase-actions">
+              <button
+                class="btn-primary"
+                type="button"
+                data-usecase-primary="brief"
+              >
+                Self-Service starten<span>›</span>
+              </button>
+              <button
+                class="btn-chat"
+                type="button"
+                data-usecase-chat="brief"
+              >
+                <span class="btn-chat-emoji">💬</span>
+                Im Chat lösen
+              </button>
+            </div>
+          </article>
+
+          <!-- Paket versenden -->
+          <article
+            class="usecase-card"
+            data-usecase-id="paket"
+          >
+            <div class="usecase-header">
+              <div class="usecase-icon">📦</div>
+              <div>
+                <div class="usecase-title">Paket versenden</div>
+                <div class="usecase-badge">Etikette, Abgabe & Abholung</div>
+              </div>
+            </div>
+            <p class="usecase-text">
+              Wähle Paketgrösse, Services wie Signature oder Priority und erfahre,
+              wo du dein Paket aufgeben kannst.
+            </p>
+            <div class="usecase-actions">
+              <button
+                class="btn-primary"
+                type="button"
+                data-usecase-primary="paket"
+              >
+                Self-Service starten<span>›</span>
+              </button>
+              <button
+                class="btn-chat"
+                type="button"
+                data-usecase-chat="paket"
+              >
+                <span class="btn-chat-emoji">💬</span>
+                Im Chat lösen
+              </button>
+            </div>
+          </article>
+
+          <!-- Sendung verfolgen -->
+          <article
+            class="usecase-card"
+            data-usecase-id="tracking"
+          >
+            <div class="usecase-header">
+              <div class="usecase-icon">🔍</div>
+              <div>
+                <div class="usecase-title">Sendung verfolgen</div>
+                <div class="usecase-badge">Tracking & Status</div>
+              </div>
+            </div>
+            <p class="usecase-text">
+              Gib deine Sendungsnummer ein und erhalte Status, voraussichtliches
+              Zustelldatum und nächste Schritte.
+            </p>
+            <div class="usecase-actions">
+              <button
+                class="btn-primary"
+                type="button"
+                data-usecase-primary="tracking"
+              >
+                Self-Service starten<span>›</span>
+              </button>
+              <button
+                class="btn-chat"
+                type="button"
+                data-usecase-chat="tracking"
+              >
+                <span class="btn-chat-emoji">💬</span>
+                Im Chat lösen
+              </button>
+            </div>
+          </article>
+
+          <!-- Zustelloptionen -->
+          <article
+            class="usecase-card"
+            data-usecase-id="zustellung"
+          >
+            <div class="usecase-header">
+              <div class="usecase-icon">🚪</div>
+              <div>
+                <div class="usecase-title">Zustellung anpassen</div>
+                <div class="usecase-badge">Abholung, Ablage, Umleitung</div>
+              </div>
+            </div>
+            <p class="usecase-text">
+              Passe Ort oder Zeitpunkt der Zustellung an, richte eine Ablage
+              ein oder wähle eine Filiale zur Abholung.
+            </p>
+            <div class="usecase-actions">
+              <button
+                class="btn-primary"
+                type="button"
+                data-usecase-primary="zustellung"
+              >
+                Self-Service starten<span>›</span>
+              </button>
+              <button
+                class="btn-chat"
+                type="button"
+                data-usecase-chat="zustellung"
+              >
+                <span class="btn-chat-emoji">💬</span>
+                Im Chat lösen
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <!-- Detail Panel für Self-Service -->
+        <div class="detail-panel" id="usecase-detail">
+          <div class="detail-title" id="detail-title"></div>
+          <div class="detail-text" id="detail-text"></div>
+          <ol class="detail-steps" id="detail-steps"></ol>
+          <div class="detail-hint">
+            Tipp: Du kannst die Schritte selbst durchführen oder unten rechts
+            den Chat öffnen und dir helfen lassen.
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Chat Toggle Button (wird per JS angezeigt) -->
     <button
       id="post-chat-toggle-btn"
       class="post-chat-toggle-btn"
       aria-label="Chat öffnen"
-      style="display:none;"
     >
       💬
     </button>
 
-    <div
-      id="post-chat-overlay"
-      class="post-chat-overlay"
-      style="display:none;"
-    >
+    <!-- Chat Overlay -->
+    <div id="post-chat-overlay" class="post-chat-overlay">
       <header class="post-chat-header">
         <div class="post-chat-header-left">
           <div class="post-logo-badge">P</div>
           <div class="post-chat-titles">
             <div class="post-chat-title">Post Assistent</div>
             <div class="post-chat-subtitle">
-              Hilfe zu Briefen, Paketen & Filialen
+              Fragen zu Briefen, Paketen &amp; Filialen
             </div>
           </div>
         </div>
@@ -312,23 +742,44 @@
 
           <button
             id="post-chat-mic-btn"
-            class="post-chat-mic-btn post-chat-mic-off"
+            class="post-chat-mic-btn"
+            title="Sprachaufnahme starten"
           >
             🎙̶
           </button>
 
-          <button id="post-chat-tts-btn" class="post-chat-tts-btn on">
+          <button
+            id="post-chat-tts-btn"
+            class="post-chat-tts-btn on"
+            title="Vorlesen deaktivieren"
+          >
             🔊
           </button>
 
-          <button id="post-chat-close-btn" class="post-chat-close-btn">
+          <button
+            id="post-chat-minimize-btn"
+            class="post-chat-minimize-btn"
+            title="Minimieren"
+          >
+            _
+          </button>
+
+          <button
+            id="post-chat-close-btn"
+            class="post-chat-close-btn"
+            title="Chat einklappen"
+          >
             ✕
           </button>
         </div>
       </header>
 
       <div class="post-chat-flow-bar">
-        <button id="post-chat-flow-brief" class="post-chat-flow-btn">
+        <button
+          id="post-chat-flow-brief"
+          class="post-chat-flow-btn"
+          type="button"
+        >
           ✉️ Brief versenden
         </button>
       </div>
@@ -342,182 +793,425 @@
           type="text"
           placeholder="Nachricht an die Post eingeben…"
         />
-        <button id="post-chat-send-btn" class="post-chat-send-btn">
+        <button
+          id="post-chat-send-btn"
+          class="post-chat-send-btn"
+          type="button"
+        >
           ➤
         </button>
       </div>
     </div>
 
-    <!-- ================================================= -->
-    <!--                   POST CHAT JS                    -->
-    <!-- ================================================= -->
+    <!-- JavaScript -->
     <script>
-      const POST_FLOW_PROMPTS = {
-        brief_versenden: {
-          de: "Bitte starte direkt den Workflow „Brief versenden“ mit mir.",
-          fr: "Merci de démarrer directement le flux « Envoyer une lettre » avec moi.",
-          it: "Per favore avvia direttamente il flusso «Inviare una lettera» con me.",
-          en: "Please start the “send letter” workflow with me directly.",
+      // --- Self-Service Use Cases (Inhalt + Chat-Prompts) ---
+      const USECASES = {
+        brief: {
+          title: "Brief versenden",
+          text:
+            "Hier hilfst du Kund:innen, den richtigen Tarif und die passende Versandart für ihren Brief zu finden.",
+          steps: [
+            "Wähle das Zielland (Inland oder Ausland).",
+            "Lege das Format fest (Standard, Gross, Maxi).",
+            "Bestimme die Versandart (A-Post, B-Post, Priority, Economy).",
+            "Drucke oder klebe die passende Frankierung auf.",
+            "Gib den Brief im Briefkasten oder in der Filiale ab.",
+          ],
+          chatPrompt:
+            "Ich möchte einen Brief versenden. Bitte führe mich Schritt für Schritt durch die richtige Frankierung und Einlieferung.",
+        },
+        paket: {
+          title: "Paket versenden",
+          text:
+            "Erklärt wird, wie Kund:innen ein Paket verpacken, frankieren und abgeben oder abholen lassen können.",
+          steps: [
+            "Verpacke den Inhalt stabil und gut gepolstert.",
+            "Miss Gewicht und Grösse, um die Paketkategorie zu bestimmen.",
+            "Wähle Services wie Signature, Priority oder Sperrgut, falls nötig.",
+            "Erstelle oder kaufe die Paketetikette.",
+            "Gib das Paket in der Filiale, am My Post 24-Automaten oder beim Kurier ab.",
+          ],
+          chatPrompt:
+            "Ich möchte ein Paket versenden. Bitte hilf mir bei Verpackung, Etikette und Abgabe.",
+        },
+        tracking: {
+          title: "Sendung verfolgen",
+          text:
+            "Kund:innen können hier ihre Sendungsnummer eingeben und den Status verstehen.",
+          steps: [
+            "Halte deine Sendungsnummer bereit (z. B. YY123456789CH).",
+            "Prüfe den aktuellen Status und das voraussichtliche Zustelldatum.",
+            "Kontrolliere, ob Zustellhindernisse oder besondere Hinweise vorliegen.",
+            "Entscheide, ob eine Anpassung der Zustellung nötig ist.",
+          ],
+          chatPrompt:
+            "Ich möchte eine Sendung verfolgen. Bitte frage mich nach der Sendungsnummer und erkläre mir den Status und die nächsten Schritte.",
+        },
+        zustellung: {
+          title: "Zustellung anpassen",
+          text:
+            "Hier können Kund:innen Abhol- oder Ablageorte wählen oder die Zustellung verschieben.",
+          steps: [
+            "Gib an, ob du Abholung in der Filiale, Ablage am Wunschort oder eine Umleitung möchtest.",
+            "Wähle die gewünschte Filiale oder den Ablageort.",
+            "Lege das Datum oder Zeitfenster der Zustellung fest.",
+            "Bestätige deine Anpassung und speichere sie im Kundenkonto.",
+          ],
+          chatPrompt:
+            "Ich möchte die Zustellung anpassen. Bitte hilf mir, Abhol- oder Ablageort und Zeitpunkt zu wählen.",
         },
       };
 
-      const POST_SYSTEM_INSTRUCTIONS = {
-        de: "Du bist ein Assistent der Schweizerischen Post. Antworte auf Deutsch und hilf bei postalischen Anliegen.",
-        fr: "Tu es un assistant de La Poste Suisse. Réponds en français et aide pour les demandes postales.",
-        it: "Sei un assistente della Posta Svizzera. Rispondi in italiano e aiuta con le richieste postali.",
-        en: "You are an assistant of Swiss Post. Answer in English and help with postal requests.",
+      const CHAT_SYSTEM = {
+        de:
+          "Du bist ein Assistent der Schweizerischen Post. Antworte auf Deutsch und hilf bei postalischen Anliegen.",
+        fr:
+          "Tu es un assistant de La Poste Suisse. Réponds en français et aide pour les demandes postales.",
+        it:
+          "Sei un assistente della Posta Svizzera. Rispondi in italiano e aiuta con le richieste postali.",
+        en:
+          "You are an assistant of Swiss Post. Answer in English and help with postal requests.",
       };
 
-      const KEY_MSG = "post_chat_messages_v1";
-      const KEY_LANG = "post_chat_language_v1";
+      const STORAGE_MESSAGES_KEY = "post_chat_messages_v1";
+      const STORAGE_LANGUAGE_KEY = "post_chat_language_v1";
 
       document.addEventListener("DOMContentLoaded", () => {
+        // ---- Self-Service UI ----
+        const detailTitle = document.getElementById("detail-title");
+        const detailText = document.getElementById("detail-text");
+        const detailSteps = document.getElementById("detail-steps");
+
+        function renderDetail(id) {
+          const uc = USECASES[id];
+          if (!uc) return;
+          detailTitle.textContent = uc.title;
+          detailText.textContent = uc.text;
+          detailSteps.innerHTML = "";
+          uc.steps.forEach((s) => {
+            const li = document.createElement("li");
+            li.textContent = s;
+            detailSteps.appendChild(li);
+          });
+        }
+
+        // Default Use Case
+        renderDetail("brief");
+
+        // Primäre Self-Service-Buttons
+        document.querySelectorAll("[data-usecase-primary]").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const id = this.getAttribute("data-usecase-primary");
+            renderDetail(id);
+          });
+        });
+
+        // Chat_buttons -> öffnen + Prompt in Chat
+        document.querySelectorAll("[data-usecase-chat]").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const id = this.getAttribute("data-usecase-chat");
+            openChatOverlay();
+            const uc = USECASES[id];
+            if (uc) {
+              handleChatSend(uc.chatPrompt);
+            }
+          });
+        });
+
+        // ---- Chat Widgets ----
         const overlay = document.getElementById("post-chat-overlay");
-        const toggleBtn = document.getElementById("post-chat-toggle-btn");
+        const toggleButton = document.getElementById("post-chat-toggle-btn");
         const languageSelect = document.getElementById(
           "post-chat-language-select"
         );
-        const micBtn = document.getElementById("post-chat-mic-btn");
-        const ttsBtn = document.getElementById("post-chat-tts-btn");
-        const closeBtn = document.getElementById("post-chat-close-btn");
-        const flowBriefBtn = document.getElementById("post-chat-flow-brief");
-        const messagesBox = document.getElementById("post-chat-messages");
+        const micButton = document.getElementById("post-chat-mic-btn");
+        const ttsButton = document.getElementById("post-chat-tts-btn");
+        const minimizeButton = document.getElementById(
+          "post-chat-minimize-btn"
+        );
+        const closeButton = document.getElementById("post-chat-close-btn");
+        const flowBriefButton = document.getElementById("post-chat-flow-brief");
+        const messagesContainer = document.getElementById(
+          "post-chat-messages"
+        );
         const input = document.getElementById("post-chat-input");
-        const sendBtn = document.getElementById("post-chat-send-btn");
+        const sendButton = document.getElementById("post-chat-send-btn");
 
-        let messages = [];
-        let language = "de";
+        let chatMessages = [];
+        let chatLanguage = "de";
         let micActive = false;
-        let recognition = null;
         let sttSupported = true;
         let ttsActive = true;
+        let recognition = null;
 
         // Load memory
         try {
-          const sM = localStorage.getItem(KEY_MSG);
-          const sL = localStorage.getItem(KEY_LANG);
-          if (sL) {
-            language = sL;
-            languageSelect.value = sL;
+          const storedMessages = localStorage.getItem(STORAGE_MESSAGES_KEY);
+          const storedLanguage = localStorage.getItem(STORAGE_LANGUAGE_KEY);
+
+          if (storedLanguage) {
+            chatLanguage = storedLanguage;
+            languageSelect.value = storedLanguage;
           }
-          if (sM) {
-            messages = JSON.parse(sM);
+
+          if (storedMessages) {
+            chatMessages = JSON.parse(storedMessages);
           } else {
-            messages = [
+            chatMessages = [
               {
                 role: "system",
-                content: POST_SYSTEM_INSTRUCTIONS["de"],
+                content: CHAT_SYSTEM["de"],
               },
             ];
           }
-        } catch {}
-
-        renderMessages();
-        openOverlay();
-
-        function saveMessages() {
-          localStorage.setItem(KEY_MSG, JSON.stringify(messages));
+        } catch (e) {
+          console.error("Fehler beim Laden der Chat-Memory", e);
         }
 
-        function saveLanguage() {
-          localStorage.setItem(KEY_LANG, language);
+        renderChatMessages();
+        // Chat initial als Bubble anzeigen (Overlay geschlossen)
+        overlay.style.display = "none";
+        toggleButton.style.display = "block";
+
+        function saveChatMessages() {
+          try {
+            localStorage.setItem(
+              STORAGE_MESSAGES_KEY,
+              JSON.stringify(chatMessages)
+            );
+          } catch (e) {
+            console.error("Fehler beim Speichern der Chat-Memory", e);
+          }
         }
 
-        function openOverlay() {
+        function saveChatLanguage() {
+          try {
+            localStorage.setItem(STORAGE_LANGUAGE_KEY, chatLanguage);
+          } catch (e) {
+            console.error("Fehler beim Speichern der Sprache", e);
+          }
+        }
+
+        function openChatOverlay() {
+          overlay.classList.remove("minimized");
           overlay.style.display = "flex";
-          toggleBtn.style.display = "none";
+          toggleButton.style.display = "none";
+          scrollChatToBottom();
         }
 
-        function closeOverlay() {
+        function closeChatOverlay() {
           overlay.style.display = "none";
-          toggleBtn.style.display = "block";
+          toggleButton.style.display = "block";
         }
 
-        toggleBtn.addEventListener("click", openOverlay);
-        closeBtn.addEventListener("click", closeOverlay);
+        function toggleMinimize() {
+          overlay.classList.toggle("minimized");
+        }
+
+        toggleButton.addEventListener("click", openChatOverlay);
+        closeButton.addEventListener("click", closeChatOverlay);
+        minimizeButton.addEventListener("click", toggleMinimize);
 
         languageSelect.addEventListener("change", () => {
-          language = languageSelect.value;
-          saveLanguage();
+          chatLanguage = languageSelect.value;
+          saveChatLanguage();
         });
 
-        function renderMessages() {
-          messagesBox.innerHTML = "";
-          messages.forEach((m) => {
-            const div = document.createElement("div");
-            div.className = "post-chat-message post-chat-message-" + m.role;
+        function renderChatMessages() {
+          messagesContainer.innerHTML = "";
+          chatMessages.forEach((m) => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "post-chat-message post-chat-message-" + m.role;
 
             if (m.role === "assistant") {
               const avatar = document.createElement("div");
               avatar.className = "post-chat-avatar";
               avatar.textContent = "P";
-              div.appendChild(avatar);
+              wrapper.appendChild(avatar);
             }
 
             const bubble = document.createElement("div");
             bubble.className = "post-chat-bubble";
             bubble.textContent = m.content;
-            div.appendChild(bubble);
+            wrapper.appendChild(bubble);
 
-            messagesBox.appendChild(div);
+            messagesContainer.appendChild(wrapper);
           });
-
-          messagesBox.scrollTop = messagesBox.scrollHeight;
+          scrollChatToBottom();
         }
 
-        function addMessage(role, content) {
-          messages.push({ role, content });
-          saveMessages();
-          renderMessages();
-
-          if (role === "assistant" && ttsActive) speak(content);
+        function scrollChatToBottom() {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        async function handleSend(optionalText) {
-          const text = optionalText || input.value.trim();
-          if (!text) return;
-          input.value = "";
+        function addChatMessage(role, content) {
+          chatMessages.push({ role: role, content: content });
+          saveChatMessages();
+          renderChatMessages();
 
-          addMessage("user", text);
-
-          // DEMO: ChatKit wird später hier eingebaut
-          const response = await mockAssistantResponse(text, language);
-          addMessage("assistant", response);
+          if (role === "assistant" && ttsActive) {
+            speakText(content);
+          }
         }
 
-        sendBtn.addEventListener("click", () => handleSend());
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") handleSend();
+        // Mic / STT
+        initSpeechRecognition();
+
+        function initSpeechRecognition() {
+          const SR =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SR) {
+            sttSupported = false;
+            micButton.disabled = true;
+            micButton.title =
+              "Spracherkennung wird von diesem Browser nicht unterstützt.";
+            return;
+          }
+          recognition = new SR();
+          recognition.lang = languageToLocale(chatLanguage);
+          recognition.interimResults = false;
+          recognition.continuous = false;
+
+          recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            input.value = input.value
+              ? input.value + " " + transcript
+              : transcript;
+          };
+
+          recognition.onerror = (event) => {
+            console.error("Speech recognition error", event);
+            micActive = false;
+            updateMicButton();
+          };
+
+          recognition.onend = () => {
+            micActive = false;
+            updateMicButton();
+          };
+        }
+
+        function languageToLocale(lang) {
+          if (lang === "de") return "de-CH";
+          if (lang === "fr") return "fr-CH";
+          if (lang === "it") return "it-CH";
+          if (lang === "en") return "en-US";
+          return "de-CH";
+        }
+
+        function updateMicButton() {
+          if (!sttSupported) return;
+          if (micActive) {
+            micButton.classList.add("on");
+            micButton.textContent = "🎙";
+            micButton.title = "Sprachaufnahme stoppen";
+          } else {
+            micButton.classList.remove("on");
+            micButton.textContent = "🎙̶";
+            micButton.title = "Sprachaufnahme starten";
+          }
+        }
+
+        micButton.addEventListener("click", () => {
+          if (!recognition || !sttSupported) return;
+          if (micActive) {
+            recognition.stop();
+            micActive = false;
+            updateMicButton();
+          } else {
+            recognition.lang = languageToLocale(chatLanguage);
+            recognition.start();
+            micActive = true;
+            updateMicButton();
+          }
         });
 
-        flowBriefBtn.addEventListener("click", () => {
-          const prompt = POST_FLOW_PROMPTS.brief_versenden[language];
-          handleSend(prompt);
+        // TTS
+        ttsButton.addEventListener("click", () => {
+          ttsActive = !ttsActive;
+          if (ttsActive) {
+            ttsButton.classList.add("on");
+            ttsButton.title = "Vorlesen deaktivieren";
+          } else {
+            ttsButton.classList.remove("on");
+            ttsButton.title = "Vorlesen aktivieren";
+            window.speechSynthesis.cancel();
+          }
         });
 
-        function speak(text) {
+        function speakText(text) {
+          if (!("speechSynthesis" in window)) return;
           const u = new SpeechSynthesisUtterance(text);
+          u.lang = languageToLocale(chatLanguage);
+          window.speechSynthesis.cancel();
           window.speechSynthesis.speak(u);
         }
 
-        ttsBtn.addEventListener("click", () => {
-          ttsActive = !ttsActive;
-          ttsBtn.classList.toggle("on", ttsActive);
+        // Senden
+        async function handleChatSend(optionalText) {
+          const text = (optionalText || input.value || "").trim();
+          if (!text) return;
+          input.value = "";
+
+          addChatMessage("user", text);
+
+          try {
+            // HIER später deinen echten ChatKit-Call einfügen
+            const assistantText = await mockAssistantResponse(
+              text,
+              chatLanguage
+            );
+            addChatMessage("assistant", assistantText);
+          } catch (e) {
+            console.error("Chat Fehler", e);
+            addChatMessage(
+              "assistant",
+              "Leider ist ein Fehler aufgetreten. Bitte versuche es später erneut."
+            );
+          }
+        }
+
+        sendButton.addEventListener("click", () => handleChatSend());
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleChatSend();
+          }
         });
+
+        // Flow-Button im Chat
+        flowBriefButton.addEventListener("click", () => {
+          const uc = USECASES["brief"];
+          if (uc) handleChatSend(uc.chatPrompt);
+        });
+
+        // Damit wir aus den Use-Case-Karten auf handleChatSend zugreifen können
+        window.handleChatSend = handleChatSend;
+        window.openChatOverlay = openChatOverlay;
       });
 
-      // Demo until ChatKit is plugged in
-      async function mockAssistantResponse(text, lang) {
-        return (
-          {
-            de: "Dies ist eine Demo-Antwort.",
-            fr: "Ceci est une réponse de démonstration.",
-            it: "Questa è una risposta di demo.",
-            en: "This is a demo answer.",
-          }[lang] +
-          "\n\nDu hast geschrieben: " +
-          text
-        );
+      // Demo-Antwort, bis ChatKit eingebunden ist
+      async function mockAssistantResponse(text, language) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            let base;
+            if (language === "de") {
+              base =
+                "Dies ist eine Demo-Antwort. Hier würdest du die echte ChatKit-Antwort sehen.";
+            } else if (language === "fr") {
+              base =
+                "Ceci est une réponse de démonstration. Ici tu verrais la vraie réponse de ChatKit.";
+            } else if (language === "it") {
+              base =
+                "Questa è una risposta di demo. Qui vedresti la vera risposta di ChatKit.";
+            } else {
+              base =
+                "This is a demo answer. Here you would see the real ChatKit answer.";
+            }
+            resolve(base + "\n\nDu hast geschrieben: \"" + text + "\"");
+          }, 600);
+        });
       }
     </script>
   </body>
