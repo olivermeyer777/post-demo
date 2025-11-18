@@ -1,1218 +1,763 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Post Self-Service & Chat Assistent</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Info Assistant – Schweizer Post</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
 
-    <style>
-      :root {
-        --post-yellow: #ffcc00;
-        --post-dark: #111111;
-        --post-border: #e5e5e5;
-        --post-bg: #ffffff;
-        --post-bg-alt: #fffaf0;
-        --post-radius-xl: 18px;
-        --post-shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.12);
+    body {
+      background: #f5f5f5;
+      color: #111;
+      min-height: 100vh;
+    }
+
+    .top-bar {
+      background: #ffd43b;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .logo-box {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #ffd43b;
+      font-weight: 700;
+    }
+
+    .top-title {
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .page-wrapper {
+      max-width: 1200px;
+      margin: 24px auto 80px;
+      padding: 0 16px;
+    }
+
+    .hero {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.04);
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .hero-pointer {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -10px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid #fff;
+    }
+
+    .main-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .tiles-column {
+      flex: 2;
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    @media (min-width: 900px) {
+      .tiles-column {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
+    }
 
-      * {
-        box-sizing: border-box;
-      }
+    .tile {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 200px;
+    }
 
-      body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
-          system-ui, sans-serif;
-        background: #ffffff;
-        color: #111111;
-      }
+    .tile-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
 
-      /* ---------- Hauptseite / Layout ---------- */
+    .tile-desc {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #555;
+      margin-bottom: 18px;
+      flex: 1;
+    }
 
-      .page-shell {
-        min-height: 100vh;
-        padding: 32px 20px 96px;
-        max-width: 1100px;
-        margin: 0 auto;
-      }
+    .tile-btn {
+      background: #111;
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
+    }
 
-      .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-      }
+    .tile-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+      background: #000;
+    }
 
-      .page-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+    .tile-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
 
-      .page-logo-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 999px;
-        background: var(--post-yellow);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 20px;
-        color: var(--post-dark);
-      }
+    .chat-column {
+      flex: 1.1;
+      position: relative;
+    }
 
-      .page-title-block {
-        display: flex;
+    /* Chat container (floating style) */
+    .chat-box {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 340px;
+      max-height: 520px;
+    }
+
+    .chat-header {
+      padding: 10px 12px;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #51cf66;
+    }
+
+    .chat-minimize-btn {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 4px;
+    }
+
+    .chat-messages {
+      padding: 12px;
+      flex: 1;
+      overflow-y: auto;
+      font-size: 14px;
+      background: #fafafa;
+    }
+
+    .chat-message {
+      max-width: 90%;
+      margin-bottom: 8px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      line-height: 1.4;
+    }
+
+    .chat-message.user {
+      margin-left: auto;
+      background: #000;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-message.assistant {
+      margin-right: auto;
+      background: #e9ecef;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-form {
+      border-top: 1px solid #e0e0e0;
+      padding: 8px;
+      display: flex;
+      gap: 6px;
+      background: #fff;
+    }
+
+    .chat-input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: #111;
+    }
+
+    .chat-send-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .chat-send-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    /* Chat bubble toggle (bottom right) */
+    .chat-toggle {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: none;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 16px 30px rgba(0,0,0,0.35);
+      z-index: 999;
+    }
+
+    .chat-box.minimized {
+      display: none;
+    }
+
+    /* Language bar */
+    .language-bar {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      z-index: 998;
+    }
+
+    .lang-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lang-btn.active {
+      background: #111;
+      color: #fff;
+    }
+
+    .lang-dot {
+      font-size: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout {
         flex-direction: column;
       }
 
-      .page-title {
-        font-size: 22px;
-        font-weight: 700;
-        letter-spacing: 0.01em;
+      .chat-column {
+        width: 100%;
       }
 
-      .page-subtitle {
-        font-size: 13px;
-        color: #666666;
+      .chat-box {
+        position: static;
+        max-height: 380px;
       }
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="logo-box">P+</div>
+    <div class="top-title" id="top-title">Info Assistant</div>
+  </header>
 
-      .page-tagline {
-        padding: 10px 14px;
-        border-radius: 999px;
-        border: 1px solid #f0f0f0;
-        font-size: 12px;
-        background: #fafafa;
-      }
+  <main class="page-wrapper">
+    <section class="hero">
+      <h1 class="hero-title" id="page-title">Willkommen bei der Post!</h1>
+      <div class="hero-pointer"></div>
+    </section>
 
-      .hero {
-        margin-bottom: 28px;
-      }
-
-      .hero-title {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 8px;
-      }
-
-      .hero-highlight {
-        background: linear-gradient(
-          120deg,
-          rgba(255, 204, 0, 0.4),
-          rgba(255, 255, 255, 0)
-        );
-        border-radius: 12px;
-        padding: 4px 8px;
-      }
-
-      .hero-text {
-        font-size: 14px;
-        color: #555555;
-        max-width: 520px;
-      }
-
-      /* ---------- Use-Case Grid ---------- */
-
-      .usecase-section-title {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-
-      .usecase-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 14px;
-        margin-bottom: 22px;
-      }
-
-      .usecase-card {
-        border-radius: 18px;
-        border: 1px solid #f0f0f0;
-        background: #ffffff;
-        padding: 14px 14px 12px;
-        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.02);
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        transition: transform 0.12s ease, box-shadow 0.12s ease,
-          border-color 0.12s ease;
-        cursor: pointer;
-      }
-
-      .usecase-card:hover {
-        transform: translateY(-2px);
-        border-color: var(--post-yellow);
-        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.04);
-      }
-
-      .usecase-header {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-
-      .usecase-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        background: #fff7d6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-      }
-
-      .usecase-title {
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .usecase-badge {
-        font-size: 11px;
-        color: #777777;
-      }
-
-      .usecase-text {
-        font-size: 12px;
-        color: #555555;
-      }
-
-      .usecase-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 4px;
-        gap: 6px;
-      }
-
-      .btn-primary {
-        border-radius: 999px;
-        border: none;
-        padding: 6px 12px;
-        background: #111111;
-        color: #ffffff;
-        font-size: 12px;
-        cursor: pointer;
-      }
-
-      .btn-primary span {
-        margin-left: 4px;
-      }
-
-      .btn-chat {
-        border-radius: 999px;
-        border: none;
-        padding: 6px 10px;
-        background: #fff7d6;
-        color: #a06b00;
-        font-size: 11px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .btn-chat-emoji {
-        font-size: 13px;
-      }
-
-      /* ---------- Detail / Self-Service Panel ---------- */
-
-      .detail-panel {
-        margin-top: 6px;
-        padding: 14px 14px 16px;
-        border-radius: 18px;
-        border: 1px dashed #e0e0e0;
-        background: #fdfdfd;
-      }
-
-      .detail-title {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 6px;
-      }
-
-      .detail-text {
-        font-size: 12px;
-        color: #555555;
-        margin-bottom: 10px;
-      }
-
-      .detail-steps {
-        font-size: 12px;
-        padding-left: 18px;
-        margin: 0;
-        color: #444444;
-      }
-
-      .detail-hint {
-        font-size: 11px;
-        color: #777777;
-        margin-top: 8px;
-      }
-
-      /* ---------- Chat Overlay ---------- */
-
-      .post-chat-toggle-btn {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        width: 56px;
-        height: 56px;
-        border-radius: 999px;
-        border: none;
-        background: var(--post-yellow);
-        color: var(--post-dark);
-        font-size: 24px;
-        box-shadow: var(--post-shadow-soft);
-        cursor: pointer;
-        z-index: 9999;
-      }
-
-      .post-chat-overlay {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        width: 380px;
-        max-width: 100vw;
-        height: 80vh;
-        max-height: 640px;
-        background: var(--post-bg);
-        border-radius: var(--post-radius-xl);
-        box-shadow: var(--post-shadow-soft);
-        display: none; /* initial hidden, JS zeigt es bei Bedarf */
-        flex-direction: column;
-        border: 1px solid var(--post-border);
-        overflow: hidden;
-        z-index: 10000;
-      }
-
-      .post-chat-overlay.minimized {
-        height: auto;
-      }
-
-      .post-chat-overlay.minimized .post-chat-flow-bar,
-      .post-chat-overlay.minimized .post-chat-messages,
-      .post-chat-overlay.minimized .post-chat-input-row {
-        display: none;
-      }
-
-      .post-chat-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 14px;
-        border-bottom: 1px solid var(--post-border);
-        background: linear-gradient(
-          to right,
-          rgba(255, 204, 0, 0.1),
-          rgba(255, 255, 255, 0.9)
-        );
-      }
-
-      .post-chat-header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .post-logo-badge {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        background: var(--post-yellow);
-        color: var(--post-dark);
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .post-chat-titles {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .post-chat-title {
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      .post-chat-subtitle {
-        font-size: 11px;
-        color: #555555;
-      }
-
-      .post-chat-header-right {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .post-chat-language-select {
-        font-size: 12px;
-        padding: 4px 6px;
-        border-radius: 999px;
-        border: 1px solid var(--post-border);
-        background: #ffffff;
-      }
-
-      .post-chat-mic-btn,
-      .post-chat-minimize-btn,
-      .post-chat-close-btn,
-      .post-chat-tts-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 999px;
-        border: none;
-        font-size: 16px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f5f5f5;
-      }
-
-      .post-chat-mic-btn {
-        background: #a00000;
-        color: #ffffff;
-        font-size: 17px;
-      }
-
-      .post-chat-mic-btn.on {
-        background: var(--post-dark);
-      }
-
-      .post-chat-tts-btn.on {
-        background: var(--post-yellow);
-      }
-
-      .post-chat-minimize-btn {
-        font-size: 18px;
-      }
-
-      .post-chat-flow-bar {
-        display: flex;
-        gap: 8px;
-        padding: 8px 12px;
-        border-bottom: 1px solid var(--post-border);
-        background: var(--post-bg-alt);
-      }
-
-      .post-chat-flow-btn {
-        border-radius: 999px;
-        border: none;
-        padding: 6px 10px;
-        font-size: 11px;
-        cursor: pointer;
-        background: #ffffff;
-        border: 1px solid var(--post-yellow);
-      }
-
-      .post-chat-messages {
-        flex: 1;
-        padding: 8px 12px;
-        overflow-y: auto;
-        background: #ffffff;
-      }
-
-      .post-chat-message {
-        display: flex;
-        margin-bottom: 8px;
-        max-width: 90%;
-      }
-
-      .post-chat-message-user {
-        justify-content: flex-end;
-        margin-left: auto;
-      }
-
-      .post-chat-message-assistant {
-        justify-content: flex-start;
-      }
-
-      .post-chat-message-system {
-        justify-content: center;
-        font-size: 11px;
-        color: #777777;
-      }
-
-      .post-chat-avatar {
-        width: 24px;
-        height: 24px;
-        border-radius: 999px;
-        background: var(--post-yellow);
-        color: var(--post-dark);
-        font-size: 12px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 6px;
-        margin-top: 2px;
-      }
-
-      .post-chat-bubble {
-        padding: 8px 10px;
-        border-radius: 14px;
-        font-size: 13px;
-        line-height: 1.3;
-      }
-
-      .post-chat-message-user .post-chat-bubble {
-        background: var(--post-yellow);
-        color: var(--post-dark);
-      }
-
-      .post-chat-message-assistant .post-chat-bubble {
-        background: #f3f3f3;
-      }
-
-      .post-chat-input-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 10px;
-        border-top: 1px solid var(--post-border);
-        background: #ffffff;
-      }
-
-      .post-chat-input {
-        flex: 1;
-        padding: 8px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--post-border);
-        font-size: 13px;
-      }
-
-      .post-chat-send-btn {
-        width: 34px;
-        height: 34px;
-        border-radius: 999px;
-        border: none;
-        cursor: pointer;
-        background: var(--post-yellow);
-        color: var(--post-dark);
-        font-size: 16px;
-      }
-
-      .post-chat-toggle-btn {
-        display: none; /* Chat initial offen, willst du nur Icon -> hier auf block setzen */
-      }
-
-      @media (max-width: 640px) {
-        .page-shell {
-          padding: 20px 16px 96px;
-        }
-        .post-chat-overlay {
-          right: 12px;
-          left: 12px;
-          width: auto;
-        }
-        .post-chat-toggle-btn {
-          right: 16px;
-          bottom: 16px;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="page-shell">
-      <!-- Header / Branding -->
-      <header class="page-header">
-        <div class="page-brand">
-          <div class="page-logo-circle">P</div>
-          <div class="page-title-block">
-            <div class="page-title">Post Self-Service</div>
-            <div class="page-subtitle">
-              Alles rund um Briefe, Pakete &amp; Zustellung.
-            </div>
+    <section class="main-layout">
+      <!-- LEFT: TILES -->
+      <div class="tiles-column">
+        <!-- Orakel -->
+        <article class="tile">
+          <div>
+            <h2 class="tile-title" id="tile-orakel-title">Orakel</h2>
+            <p class="tile-desc" id="tile-orakel-desc">
+              Stelle dem Orakel deine Frage rund um die Post – der Assistent
+              schlägt dir passende Antworten und nächste Schritte vor.
+            </p>
           </div>
-        </div>
-        <div class="page-tagline">Self-Service oder Chat – du entscheidest.</div>
-      </header>
+          <button class="tile-btn" id="tile-orakel-btn">
+            <span id="tile-orakel-btn-text">Bedienung starten</span>
+          </button>
+        </article>
 
-      <!-- Hero Text -->
-      <section class="hero">
-        <div class="hero-title">
-          Deine Post-Anliegen,
-          <span class="hero-highlight">in wenigen Klicks oder im Chat gelöst.</span>
-        </div>
-        <p class="hero-text">
-          Wähle einen Bereich aus, um Schritt für Schritt durch den Self-Service
-          geführt zu werden – oder wechsle jederzeit in den Chat und lass dir
-          vom Assistenten helfen.
-        </p>
-      </section>
-
-      <!-- Use Case Grid -->
-      <section>
-        <div class="usecase-section-title">Was möchtest du erledigen?</div>
-        <div class="usecase-grid">
-          <!-- Brief versenden -->
-          <article
-            class="usecase-card"
-            data-usecase-id="brief"
-          >
-            <div class="usecase-header">
-              <div class="usecase-icon">✉️</div>
-              <div>
-                <div class="usecase-title">Brief versenden</div>
-                <div class="usecase-badge">Inland & Ausland</div>
-              </div>
-            </div>
-            <p class="usecase-text">
-              Finde das passende Format, Porto und die optimale Einwurf-Option
-              für deinen Brief.
+        <!-- Self-Service -->
+        <article class="tile">
+          <div>
+            <h2 class="tile-title" id="tile-self-title">Self-Service</h2>
+            <p class="tile-desc" id="tile-self-desc">
+              Finde Schritt für Schritt die richtige Self-Service-Lösung:
+              Sendungsverfolgung, Umzug melden, Abholaufträge und mehr.
             </p>
-            <div class="usecase-actions">
-              <button
-                class="btn-primary"
-                type="button"
-                data-usecase-primary="brief"
-              >
-                Self-Service starten<span>›</span>
-              </button>
-              <button
-                class="btn-chat"
-                type="button"
-                data-usecase-chat="brief"
-              >
-                <span class="btn-chat-emoji">💬</span>
-                Im Chat lösen
-              </button>
-            </div>
-          </article>
-
-          <!-- Paket versenden -->
-          <article
-            class="usecase-card"
-            data-usecase-id="paket"
-          >
-            <div class="usecase-header">
-              <div class="usecase-icon">📦</div>
-              <div>
-                <div class="usecase-title">Paket versenden</div>
-                <div class="usecase-badge">Etikette, Abgabe & Abholung</div>
-              </div>
-            </div>
-            <p class="usecase-text">
-              Wähle Paketgrösse, Services wie Signature oder Priority und erfahre,
-              wo du dein Paket aufgeben kannst.
-            </p>
-            <div class="usecase-actions">
-              <button
-                class="btn-primary"
-                type="button"
-                data-usecase-primary="paket"
-              >
-                Self-Service starten<span>›</span>
-              </button>
-              <button
-                class="btn-chat"
-                type="button"
-                data-usecase-chat="paket"
-              >
-                <span class="btn-chat-emoji">💬</span>
-                Im Chat lösen
-              </button>
-            </div>
-          </article>
-
-          <!-- Sendung verfolgen -->
-          <article
-            class="usecase-card"
-            data-usecase-id="tracking"
-          >
-            <div class="usecase-header">
-              <div class="usecase-icon">🔍</div>
-              <div>
-                <div class="usecase-title">Sendung verfolgen</div>
-                <div class="usecase-badge">Tracking & Status</div>
-              </div>
-            </div>
-            <p class="usecase-text">
-              Gib deine Sendungsnummer ein und erhalte Status, voraussichtliches
-              Zustelldatum und nächste Schritte.
-            </p>
-            <div class="usecase-actions">
-              <button
-                class="btn-primary"
-                type="button"
-                data-usecase-primary="tracking"
-              >
-                Self-Service starten<span>›</span>
-              </button>
-              <button
-                class="btn-chat"
-                type="button"
-                data-usecase-chat="tracking"
-              >
-                <span class="btn-chat-emoji">💬</span>
-                Im Chat lösen
-              </button>
-            </div>
-          </article>
-
-          <!-- Zustelloptionen -->
-          <article
-            class="usecase-card"
-            data-usecase-id="zustellung"
-          >
-            <div class="usecase-header">
-              <div class="usecase-icon">🚪</div>
-              <div>
-                <div class="usecase-title">Zustellung anpassen</div>
-                <div class="usecase-badge">Abholung, Ablage, Umleitung</div>
-              </div>
-            </div>
-            <p class="usecase-text">
-              Passe Ort oder Zeitpunkt der Zustellung an, richte eine Ablage
-              ein oder wähle eine Filiale zur Abholung.
-            </p>
-            <div class="usecase-actions">
-              <button
-                class="btn-primary"
-                type="button"
-                data-usecase-primary="zustellung"
-              >
-                Self-Service starten<span>›</span>
-              </button>
-              <button
-                class="btn-chat"
-                type="button"
-                data-usecase-chat="zustellung"
-              >
-                <span class="btn-chat-emoji">💬</span>
-                Im Chat lösen
-              </button>
-            </div>
-          </article>
-        </div>
-
-        <!-- Detail Panel für Self-Service -->
-        <div class="detail-panel" id="usecase-detail">
-          <div class="detail-title" id="detail-title"></div>
-          <div class="detail-text" id="detail-text"></div>
-          <ol class="detail-steps" id="detail-steps"></ol>
-          <div class="detail-hint">
-            Tipp: Du kannst die Schritte selbst durchführen oder unten rechts
-            den Chat öffnen und dir helfen lassen.
           </div>
-        </div>
-      </section>
-    </div>
+          <button class="tile-btn" id="tile-self-btn">
+            <span id="tile-self-btn-text">Self-Service starten</span>
+          </button>
+        </article>
 
-    <!-- Chat Toggle Button (wird per JS angezeigt) -->
-    <button
-      id="post-chat-toggle-btn"
-      class="post-chat-toggle-btn"
-      aria-label="Chat öffnen"
-    >
-      💬
+        <!-- Video-Bedienung -->
+        <article class="tile">
+          <div>
+            <h2 class="tile-title" id="tile-video-title">Video-Bedienung</h2>
+            <p class="tile-desc" id="tile-video-desc">
+              Sprich live mit einer Mitarbeitenden der Post per Video-Beratung –
+              ideal bei komplexeren Anliegen.
+            </p>
+          </div>
+          <button class="tile-btn" id="tile-video-btn">
+            <span id="tile-video-btn-text">Video-Bedienung starten</span>
+          </button>
+        </article>
+      </div>
+
+      <!-- RIGHT: CHAT -->
+      <aside class="chat-column">
+        <div class="chat-box" id="chat-box">
+          <div class="chat-header">
+            <div class="chat-header-left">
+              <div class="chat-status-dot"></div>
+              <span id="chat-header-title">Chat-Assistent</span>
+            </div>
+            <button class="chat-minimize-btn" id="chat-minimize" aria-label="Chat minimieren">
+              &minus;
+            </button>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <form class="chat-form" id="chat-form">
+            <input
+              id="chat-input"
+              class="chat-input"
+              type="text"
+              autocomplete="off"
+              placeholder="Schreibe deine Frage…"
+            />
+            <button type="submit" class="chat-send-btn" id="chat-send-btn">
+              <span id="chat-send-label">Senden</span>
+            </button>
+          </form>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Chat toggle bubble -->
+  <button class="chat-toggle" id="chat-toggle" aria-label="Chat öffnen oder schliessen">
+    💬
+  </button>
+
+  <!-- Language buttons -->
+  <div class="language-bar">
+    <button class="lang-btn active" data-lang="de">
+      <span class="lang-dot">🌐</span><span>Deutsch</span>
     </button>
+    <button class="lang-btn" data-lang="fr">
+      <span class="lang-dot">🌐</span><span>Français</span>
+    </button>
+    <button class="lang-btn" data-lang="it">
+      <span class="lang-dot">🌐</span><span>Italiano</span>
+    </button>
+    <button class="lang-btn" data-lang="en">
+      <span class="lang-dot">🌐</span><span>English</span>
+    </button>
+    <button class="lang-btn" data-lang="es">
+      <span class="lang-dot">🌐</span><span>Español</span>
+    </button>
+    <button class="lang-btn" data-lang="pt">
+      <span class="lang-dot">🌐</span><span>Português</span>
+    </button>
+  </div>
 
-    <!-- Chat Overlay -->
-    <div id="post-chat-overlay" class="post-chat-overlay">
-      <header class="post-chat-header">
-        <div class="post-chat-header-left">
-          <div class="post-logo-badge">P</div>
-          <div class="post-chat-titles">
-            <div class="post-chat-title">Post Assistent</div>
-            <div class="post-chat-subtitle">
-              Fragen zu Briefen, Paketen &amp; Filialen
-            </div>
-          </div>
-        </div>
+  <script>
+    /**************************************
+     * 1) OPENAI / AGENT SETTINGS
+     **************************************/
 
-        <div class="post-chat-header-right">
-          <select
-            id="post-chat-language-select"
-            class="post-chat-language-select"
-          >
-            <option value="de">DE</option>
-            <option value="fr">FR</option>
-            <option value="it">IT</option>
-            <option value="en">EN</option>
-          </select>
+    // TODO: Trage hier deinen Domain Project Key ein,
+    // z.B. "domain_pk_...."
+    const OPENAI_PUBLIC_KEY = "YOUR_DOMAIN_PUBLIC_KEY_HERE";
 
-          <button
-            id="post-chat-mic-btn"
-            class="post-chat-mic-btn"
-            title="Sprachaufnahme starten"
-          >
-            🎙̶
-          </button>
+    // TODO: Trage hier die Agent-ID aus dem Agent Builder ein
+    // (z.B. "agent_1234...")
+    const OPENAI_AGENT_ID = "YOUR_AGENT_ID_HERE";
 
-          <button
-            id="post-chat-tts-btn"
-            class="post-chat-tts-btn on"
-            title="Vorlesen deaktivieren"
-          >
-            🔊
-          </button>
-
-          <button
-            id="post-chat-minimize-btn"
-            class="post-chat-minimize-btn"
-            title="Minimieren"
-          >
-            _
-          </button>
-
-          <button
-            id="post-chat-close-btn"
-            class="post-chat-close-btn"
-            title="Chat einklappen"
-          >
-            ✕
-          </button>
-        </div>
-      </header>
-
-      <div class="post-chat-flow-bar">
-        <button
-          id="post-chat-flow-brief"
-          class="post-chat-flow-btn"
-          type="button"
-        >
-          ✉️ Brief versenden
-        </button>
-      </div>
-
-      <div id="post-chat-messages" class="post-chat-messages"></div>
-
-      <div class="post-chat-input-row">
-        <input
-          id="post-chat-input"
-          class="post-chat-input"
-          type="text"
-          placeholder="Nachricht an die Post eingeben…"
-        />
-        <button
-          id="post-chat-send-btn"
-          class="post-chat-send-btn"
-          type="button"
-        >
-          ➤
-        </button>
-      </div>
-    </div>
-
-    <!-- JavaScript -->
-    <script>
-      // --- Self-Service Use Cases (Inhalt + Chat-Prompts) ---
-      const USECASES = {
-        brief: {
-          title: "Brief versenden",
-          text:
-            "Hier hilfst du Kund:innen, den richtigen Tarif und die passende Versandart für ihren Brief zu finden.",
-          steps: [
-            "Wähle das Zielland (Inland oder Ausland).",
-            "Lege das Format fest (Standard, Gross, Maxi).",
-            "Bestimme die Versandart (A-Post, B-Post, Priority, Economy).",
-            "Drucke oder klebe die passende Frankierung auf.",
-            "Gib den Brief im Briefkasten oder in der Filiale ab.",
-          ],
-          chatPrompt:
-            "Ich möchte einen Brief versenden. Bitte führe mich Schritt für Schritt durch die richtige Frankierung und Einlieferung.",
-        },
-        paket: {
-          title: "Paket versenden",
-          text:
-            "Erklärt wird, wie Kund:innen ein Paket verpacken, frankieren und abgeben oder abholen lassen können.",
-          steps: [
-            "Verpacke den Inhalt stabil und gut gepolstert.",
-            "Miss Gewicht und Grösse, um die Paketkategorie zu bestimmen.",
-            "Wähle Services wie Signature, Priority oder Sperrgut, falls nötig.",
-            "Erstelle oder kaufe die Paketetikette.",
-            "Gib das Paket in der Filiale, am My Post 24-Automaten oder beim Kurier ab.",
-          ],
-          chatPrompt:
-            "Ich möchte ein Paket versenden. Bitte hilf mir bei Verpackung, Etikette und Abgabe.",
-        },
-        tracking: {
-          title: "Sendung verfolgen",
-          text:
-            "Kund:innen können hier ihre Sendungsnummer eingeben und den Status verstehen.",
-          steps: [
-            "Halte deine Sendungsnummer bereit (z. B. YY123456789CH).",
-            "Prüfe den aktuellen Status und das voraussichtliche Zustelldatum.",
-            "Kontrolliere, ob Zustellhindernisse oder besondere Hinweise vorliegen.",
-            "Entscheide, ob eine Anpassung der Zustellung nötig ist.",
-          ],
-          chatPrompt:
-            "Ich möchte eine Sendung verfolgen. Bitte frage mich nach der Sendungsnummer und erkläre mir den Status und die nächsten Schritte.",
-        },
-        zustellung: {
-          title: "Zustellung anpassen",
-          text:
-            "Hier können Kund:innen Abhol- oder Ablageorte wählen oder die Zustellung verschieben.",
-          steps: [
-            "Gib an, ob du Abholung in der Filiale, Ablage am Wunschort oder eine Umleitung möchtest.",
-            "Wähle die gewünschte Filiale oder den Ablageort.",
-            "Lege das Datum oder Zeitfenster der Zustellung fest.",
-            "Bestätige deine Anpassung und speichere sie im Kundenkonto.",
-          ],
-          chatPrompt:
-            "Ich möchte die Zustellung anpassen. Bitte hilf mir, Abhol- oder Ablageort und Zeitpunkt zu wählen.",
-        },
-      };
-
-      const CHAT_SYSTEM = {
-        de:
-          "Du bist ein Assistent der Schweizerischen Post. Antworte auf Deutsch und hilf bei postalischen Anliegen.",
-        fr:
-          "Tu es un assistant de La Poste Suisse. Réponds en français et aide pour les demandes postales.",
-        it:
-          "Sei un assistente della Posta Svizzera. Rispondi in italiano e aiuta con le richieste postali.",
-        en:
-          "You are an assistant of Swiss Post. Answer in English and help with postal requests.",
-      };
-
-      const STORAGE_MESSAGES_KEY = "post_chat_messages_v1";
-      const STORAGE_LANGUAGE_KEY = "post_chat_language_v1";
-
-      document.addEventListener("DOMContentLoaded", () => {
-        // ---- Self-Service UI ----
-        const detailTitle = document.getElementById("detail-title");
-        const detailText = document.getElementById("detail-text");
-        const detailSteps = document.getElementById("detail-steps");
-
-        function renderDetail(id) {
-          const uc = USECASES[id];
-          if (!uc) return;
-          detailTitle.textContent = uc.title;
-          detailText.textContent = uc.text;
-          detailSteps.innerHTML = "";
-          uc.steps.forEach((s) => {
-            const li = document.createElement("li");
-            li.textContent = s;
-            detailSteps.appendChild(li);
-          });
-        }
-
-        // Default Use Case
-        renderDetail("brief");
-
-        // Primäre Self-Service-Buttons
-        document.querySelectorAll("[data-usecase-primary]").forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const id = this.getAttribute("data-usecase-primary");
-            renderDetail(id);
-          });
-        });
-
-        // Chat_buttons -> öffnen + Prompt in Chat
-        document.querySelectorAll("[data-usecase-chat]").forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const id = this.getAttribute("data-usecase-chat");
-            openChatOverlay();
-            const uc = USECASES[id];
-            if (uc) {
-              handleChatSend(uc.chatPrompt);
-            }
-          });
-        });
-
-        // ---- Chat Widgets ----
-        const overlay = document.getElementById("post-chat-overlay");
-        const toggleButton = document.getElementById("post-chat-toggle-btn");
-        const languageSelect = document.getElementById(
-          "post-chat-language-select"
-        );
-        const micButton = document.getElementById("post-chat-mic-btn");
-        const ttsButton = document.getElementById("post-chat-tts-btn");
-        const minimizeButton = document.getElementById(
-          "post-chat-minimize-btn"
-        );
-        const closeButton = document.getElementById("post-chat-close-btn");
-        const flowBriefButton = document.getElementById("post-chat-flow-brief");
-        const messagesContainer = document.getElementById(
-          "post-chat-messages"
-        );
-        const input = document.getElementById("post-chat-input");
-        const sendButton = document.getElementById("post-chat-send-btn");
-
-        let chatMessages = [];
-        let chatLanguage = "de";
-        let micActive = false;
-        let sttSupported = true;
-        let ttsActive = true;
-        let recognition = null;
-
-        // Load memory
-        try {
-          const storedMessages = localStorage.getItem(STORAGE_MESSAGES_KEY);
-          const storedLanguage = localStorage.getItem(STORAGE_LANGUAGE_KEY);
-
-          if (storedLanguage) {
-            chatLanguage = storedLanguage;
-            languageSelect.value = storedLanguage;
-          }
-
-          if (storedMessages) {
-            chatMessages = JSON.parse(storedMessages);
-          } else {
-            chatMessages = [
-              {
-                role: "system",
-                content: CHAT_SYSTEM["de"],
-              },
-            ];
-          }
-        } catch (e) {
-          console.error("Fehler beim Laden der Chat-Memory", e);
-        }
-
-        renderChatMessages();
-        // Chat initial als Bubble anzeigen (Overlay geschlossen)
-        overlay.style.display = "none";
-        toggleButton.style.display = "block";
-
-        function saveChatMessages() {
-          try {
-            localStorage.setItem(
-              STORAGE_MESSAGES_KEY,
-              JSON.stringify(chatMessages)
-            );
-          } catch (e) {
-            console.error("Fehler beim Speichern der Chat-Memory", e);
-          }
-        }
-
-        function saveChatLanguage() {
-          try {
-            localStorage.setItem(STORAGE_LANGUAGE_KEY, chatLanguage);
-          } catch (e) {
-            console.error("Fehler beim Speichern der Sprache", e);
-          }
-        }
-
-        function openChatOverlay() {
-          overlay.classList.remove("minimized");
-          overlay.style.display = "flex";
-          toggleButton.style.display = "none";
-          scrollChatToBottom();
-        }
-
-        function closeChatOverlay() {
-          overlay.style.display = "none";
-          toggleButton.style.display = "block";
-        }
-
-        function toggleMinimize() {
-          overlay.classList.toggle("minimized");
-        }
-
-        toggleButton.addEventListener("click", openChatOverlay);
-        closeButton.addEventListener("click", closeChatOverlay);
-        minimizeButton.addEventListener("click", toggleMinimize);
-
-        languageSelect.addEventListener("change", () => {
-          chatLanguage = languageSelect.value;
-          saveChatLanguage();
-        });
-
-        function renderChatMessages() {
-          messagesContainer.innerHTML = "";
-          chatMessages.forEach((m) => {
-            const wrapper = document.createElement("div");
-            wrapper.className = "post-chat-message post-chat-message-" + m.role;
-
-            if (m.role === "assistant") {
-              const avatar = document.createElement("div");
-              avatar.className = "post-chat-avatar";
-              avatar.textContent = "P";
-              wrapper.appendChild(avatar);
-            }
-
-            const bubble = document.createElement("div");
-            bubble.className = "post-chat-bubble";
-            bubble.textContent = m.content;
-            wrapper.appendChild(bubble);
-
-            messagesContainer.appendChild(wrapper);
-          });
-          scrollChatToBottom();
-        }
-
-        function scrollChatToBottom() {
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function addChatMessage(role, content) {
-          chatMessages.push({ role: role, content: content });
-          saveChatMessages();
-          renderChatMessages();
-
-          if (role === "assistant" && ttsActive) {
-            speakText(content);
-          }
-        }
-
-        // Mic / STT
-        initSpeechRecognition();
-
-        function initSpeechRecognition() {
-          const SR =
-            window.SpeechRecognition || window.webkitSpeechRecognition;
-          if (!SR) {
-            sttSupported = false;
-            micButton.disabled = true;
-            micButton.title =
-              "Spracherkennung wird von diesem Browser nicht unterstützt.";
-            return;
-          }
-          recognition = new SR();
-          recognition.lang = languageToLocale(chatLanguage);
-          recognition.interimResults = false;
-          recognition.continuous = false;
-
-          recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            input.value = input.value
-              ? input.value + " " + transcript
-              : transcript;
-          };
-
-          recognition.onerror = (event) => {
-            console.error("Speech recognition error", event);
-            micActive = false;
-            updateMicButton();
-          };
-
-          recognition.onend = () => {
-            micActive = false;
-            updateMicButton();
-          };
-        }
-
-        function languageToLocale(lang) {
-          if (lang === "de") return "de-CH";
-          if (lang === "fr") return "fr-CH";
-          if (lang === "it") return "it-CH";
-          if (lang === "en") return "en-US";
-          return "de-CH";
-        }
-
-        function updateMicButton() {
-          if (!sttSupported) return;
-          if (micActive) {
-            micButton.classList.add("on");
-            micButton.textContent = "🎙";
-            micButton.title = "Sprachaufnahme stoppen";
-          } else {
-            micButton.classList.remove("on");
-            micButton.textContent = "🎙̶";
-            micButton.title = "Sprachaufnahme starten";
-          }
-        }
-
-        micButton.addEventListener("click", () => {
-          if (!recognition || !sttSupported) return;
-          if (micActive) {
-            recognition.stop();
-            micActive = false;
-            updateMicButton();
-          } else {
-            recognition.lang = languageToLocale(chatLanguage);
-            recognition.start();
-            micActive = true;
-            updateMicButton();
-          }
-        });
-
-        // TTS
-        ttsButton.addEventListener("click", () => {
-          ttsActive = !ttsActive;
-          if (ttsActive) {
-            ttsButton.classList.add("on");
-            ttsButton.title = "Vorlesen deaktivieren";
-          } else {
-            ttsButton.classList.remove("on");
-            ttsButton.title = "Vorlesen aktivieren";
-            window.speechSynthesis.cancel();
-          }
-        });
-
-        function speakText(text) {
-          if (!("speechSynthesis" in window)) return;
-          const u = new SpeechSynthesisUtterance(text);
-          u.lang = languageToLocale(chatLanguage);
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(u);
-        }
-
-        // Senden
-        async function handleChatSend(optionalText) {
-          const text = (optionalText || input.value || "").trim();
-          if (!text) return;
-          input.value = "";
-
-          addChatMessage("user", text);
-
-          try {
-            // HIER später deinen echten ChatKit-Call einfügen
-            const assistantText = await mockAssistantResponse(
-              text,
-              chatLanguage
-            );
-            addChatMessage("assistant", assistantText);
-          } catch (e) {
-            console.error("Chat Fehler", e);
-            addChatMessage(
-              "assistant",
-              "Leider ist ein Fehler aufgetreten. Bitte versuche es später erneut."
-            );
-          }
-        }
-
-        sendButton.addEventListener("click", () => handleChatSend());
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleChatSend();
-          }
-        });
-
-        // Flow-Button im Chat
-        flowBriefButton.addEventListener("click", () => {
-          const uc = USECASES["brief"];
-          if (uc) handleChatSend(uc.chatPrompt);
-        });
-
-        // Damit wir aus den Use-Case-Karten auf handleChatSend zugreifen können
-        window.handleChatSend = handleChatSend;
-        window.openChatOverlay = openChatOverlay;
-      });
-
-      // Demo-Antwort, bis ChatKit eingebunden ist
-      async function mockAssistantResponse(text, language) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            let base;
-            if (language === "de") {
-              base =
-                "Dies ist eine Demo-Antwort. Hier würdest du die echte ChatKit-Antwort sehen.";
-            } else if (language === "fr") {
-              base =
-                "Ceci est une réponse de démonstration. Ici tu verrais la vraie réponse de ChatKit.";
-            } else if (language === "it") {
-              base =
-                "Questa è una risposta di demo. Qui vedresti la vera risposta di ChatKit.";
-            } else {
-              base =
-                "This is a demo answer. Here you would see the real ChatKit answer.";
-            }
-            resolve(base + "\n\nDu hast geschrieben: \"" + text + "\"");
-          }, 600);
-        });
+    async function sendMessageToOpenAI(message) {
+      if (!OPENAI_PUBLIC_KEY || OPENAI_PUBLIC_KEY.startsWith("YOUR_")) {
+        // Fallback, falls noch kein Key gesetzt ist
+        return "Der Prototyp ist noch nicht mit der OpenAI-API verbunden. Bitte trage deinen Domain-Schlüssel im Code ein.";
       }
-    </script>
-  </body>
+
+      try {
+        const response = await fetch("https://api.openai.com/v1/responses", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + OPENAI_PUBLIC_KEY,
+            "OpenAI-Beta": "agents=v1"
+          },
+          body: JSON.stringify({
+            // Wenn du lieber direkt ein Modell statt Agent nutzt:
+            // "model": "gpt-4.1-mini",
+            agent_id: OPENAI_AGENT_ID,
+            input: message
+          })
+        });
+
+        if (!response.ok) {
+          console.error("OpenAI error", await response.text());
+          return "Es ist ein Fehler beim Aufruf des Assistenten aufgetreten.";
+        }
+
+        const data = await response.json();
+        // Agent-Response Struktur: output[0].content[0].text.value
+        const text =
+          data.output?.[0]?.content?.[0]?.text?.value ||
+          "Ich konnte leider keine Antwort vom Assistenten lesen.";
+        return text;
+      } catch (err) {
+        console.error(err);
+        return "Die Verbindung zum Assistenten ist fehlgeschlagen.";
+      }
+    }
+
+    /**************************************
+     * 2) CHAT UI LOGIK
+     **************************************/
+
+    const chatBox = document.getElementById("chat-box");
+    const chatToggleBtn = document.getElementById("chat-toggle");
+    const minimizeBtn = document.getElementById("chat-minimize");
+    const chatMessages = document.getElementById("chat-messages");
+    const chatForm = document.getElementById("chat-form");
+    const chatInput = document.getElementById("chat-input");
+    const chatSendBtn = document.getElementById("chat-send-btn");
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.classList.add("chat-message", sender);
+      div.textContent = text;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Begrüssung
+    addMessage(
+      "Hallo! Ich bin dein Assistent der Schweizer Post. Wie kann ich dir helfen?",
+      "assistant"
+    );
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const value = chatInput.value.trim();
+      if (!value) return;
+
+      addMessage(value, "user");
+      chatInput.value = "";
+      chatInput.focus();
+
+      chatSendBtn.disabled = true;
+
+      const thinkingMsg = document.createElement("div");
+      thinkingMsg.classList.add("chat-message", "assistant");
+      thinkingMsg.textContent = "Denke nach…";
+      chatMessages.appendChild(thinkingMsg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      const reply = await sendMessageToOpenAI(value);
+
+      thinkingMsg.remove();
+      addMessage(reply, "assistant");
+      chatSendBtn.disabled = false;
+    });
+
+    chatToggleBtn.addEventListener("click", () => {
+      chatBox.classList.toggle("minimized");
+    });
+
+    minimizeBtn.addEventListener("click", () => {
+      chatBox.classList.add("minimized");
+    });
+
+    /**************************************
+     * 3) TILE BUTTON HANDLER (DEMO)
+     **************************************/
+
+    document.getElementById("tile-orakel-btn").addEventListener("click", () => {
+      addMessage("Du hast das Orakel geöffnet. Stelle deine Frage im Chat.", "assistant");
+      chatBox.classList.remove("minimized");
+    });
+
+    document.getElementById("tile-self-btn").addEventListener("click", () => {
+      addMessage(
+        "Self-Service: Beschreibe kurz dein Anliegen, ich führe dich durch die passenden Online-Services.",
+        "assistant"
+      );
+      chatBox.classList.remove("minimized");
+    });
+
+    document.getElementById("tile-video-btn").addEventListener("click", () => {
+      addMessage(
+        "Video-Bedienung ist in diesem Prototyp noch nicht aktiv. Hier könnte der Link zu einem Video-Call oder einer Warteschlange erscheinen.",
+        "assistant"
+      );
+      chatBox.classList.remove("minimized");
+    });
+
+    /**************************************
+     * 4) SPRACHWECHSEL
+     **************************************/
+
+    const translations = {
+      de: {
+        topTitle: "Info Assistant",
+        pageTitle: "Willkommen bei der Post!",
+        chatHeaderTitle: "Chat-Assistent",
+        chatPlaceholder: "Schreibe deine Frage…",
+        chatSendLabel: "Senden",
+        tiles: {
+          orakelTitle: "Orakel",
+          orakelDesc:
+            "Stelle dem Orakel deine Frage rund um die Post – der Assistent schlägt dir passende Antworten und nächste Schritte vor.",
+          orakelButton: "Bedienung starten",
+          selfTitle: "Self-Service",
+          selfDesc:
+            "Finde Schritt für Schritt die richtige Self-Service-Lösung: Sendungsverfolgung, Umzug melden, Abholaufträge und mehr.",
+          selfButton: "Self-Service starten",
+          videoTitle: "Video-Bedienung",
+          videoDesc:
+            "Sprich live mit einer Mitarbeitenden der Post per Video-Beratung – ideal bei komplexeren Anliegen.",
+          videoButton: "Video-Bedienung starten"
+        }
+      },
+      fr: {
+        topTitle: "Assistant d’information",
+        pageTitle: "Bienvenue à la Poste!",
+        chatHeaderTitle: "Assistant de chat",
+        chatPlaceholder: "Écrivez votre question…",
+        chatSendLabel: "Envoyer",
+        tiles: {
+          orakelTitle: "Oracle",
+          orakelDesc:
+            "Posez votre question à l’Oracle au sujet de la Poste – l’assistant vous propose des réponses et les prochaines étapes.",
+          orakelButton: "Démarrer",
+          selfTitle: "Self-Service",
+          selfDesc:
+            "Trouvez pas à pas la bonne solution en libre-service : suivi des envois, annonce de déménagement, ordres de retrait, etc.",
+          selfButton: "Lancer le self-service",
+          videoTitle: "Assistance vidéo",
+          videoDesc:
+            "Parlez en direct avec une collaboratrice ou un collaborateur de la Poste par assistance vidéo – idéal pour les demandes complexes.",
+          videoButton: "Démarrer l’assistance vidéo"
+        }
+      },
+      it: {
+        topTitle: "Assistente informazioni",
+        pageTitle: "Benvenuti alla Posta!",
+        chatHeaderTitle: "Assistente chat",
+        chatPlaceholder: "Scrivi la tua domanda…",
+        chatSendLabel: "Invia",
+        tiles: {
+          orakelTitle: "Oracolo",
+          orakelDesc:
+            "Poni la tua domanda sull’ufficio postale all’Oracolo – l’assistente ti suggerisce risposte e passi successivi.",
+          orakelButton: "Avvia assistenza",
+          selfTitle: "Self-Service",
+          selfDesc:
+            "Trova passo dopo passo la soluzione self-service giusta: tracciamento invii, notifica di trasferimento, ordini di ritiro e altro.",
+          selfButton: "Avvia self-service",
+          videoTitle: "Assistenza video",
+          videoDesc:
+            "Parla in diretta con una collaboratrice o un collaboratore della Posta tramite consulenza video – ideale per richieste complesse.",
+          videoButton: "Avvia assistenza video"
+        }
+      },
+      en: {
+        topTitle: "Info Assistant",
+        pageTitle: "Welcome to Swiss Post!",
+        chatHeaderTitle: "Chat Assistant",
+        chatPlaceholder: "Type your question…",
+        chatSendLabel: "Send",
+        tiles: {
+          orakelTitle: "Oracle",
+          orakelDesc:
+            "Ask the Oracle your question about Swiss Post – the assistant suggests answers and next steps.",
+          orakelButton: "Start service",
+          selfTitle: "Self-Service",
+          selfDesc:
+            "Step by step to the right self-service solution: track & trace, change of address, pick-up orders and more.",
+          selfButton: "Start self-service",
+          videoTitle: "Video Service",
+          videoDesc:
+            "Talk live to a Swiss Post staff member via video – ideal for more complex requests.",
+          videoButton: "Start video service"
+        }
+      },
+      es: {
+        topTitle: "Asistente de información",
+        pageTitle: "¡Bienvenido a Correos!",
+        chatHeaderTitle: "Asistente de chat",
+        chatPlaceholder: "Escribe tu pregunta…",
+        chatSendLabel: "Enviar",
+        tiles: {
+          orakelTitle: "Oráculo",
+          orakelDesc:
+            "Haz tu pregunta sobre Correos al Oráculo: el asistente te sugiere respuestas y próximos pasos.",
+          orakelButton: "Iniciar atención",
+          selfTitle: "Autoservicio",
+          selfDesc:
+            "Encuentra paso a paso la solución de autoservicio adecuada: seguimiento de envíos, cambio de dirección, órdenes de recogida y más.",
+          selfButton: "Iniciar autoservicio",
+          videoTitle: "Atención por vídeo",
+          videoDesc:
+            "Habla en directo con una persona de Correos por videollamada; ideal para consultas complejas.",
+          videoButton: "Iniciar atención por vídeo"
+        }
+      },
+      pt: {
+        topTitle: "Assistente de informações",
+        pageTitle: "Bem-vindo ao Correio!",
+        chatHeaderTitle: "Assistente de chat",
+        chatPlaceholder: "Escreva a sua pergunta…",
+        chatSendLabel: "Enviar",
+        tiles: {
+          orakelTitle: "Oráculo",
+          orakelDesc:
+            "Faça sua pergunta sobre o correio ao Oráculo – o assistente sugere respostas e próximos passos.",
+          orakelButton: "Iniciar atendimento",
+          selfTitle: "Self-Service",
+          selfDesc:
+            "Encontre passo a passo a solução certa em self-service: rastreamento de envios, mudança de endereço, pedidos de recolha e muito mais.",
+          selfButton: "Iniciar self-service",
+          videoTitle: "Atendimento por vídeo",
+          videoDesc:
+            "Fale ao vivo com uma colaboradora ou um colaborador do correio por vídeo – ideal para pedidos mais complexos.",
+          videoButton: "Iniciar atendimento por vídeo"
+        }
+      }
+    };
+
+    function setLanguage(lang) {
+      const t = translations[lang] || translations.de;
+
+      document.documentElement.lang = lang;
+      document.getElementById("top-title").textContent = t.topTitle;
+      document.getElementById("page-title").textContent = t.pageTitle;
+      document.getElementById("chat-header-title").textContent = t.chatHeaderTitle;
+      document.getElementById("chat-input").placeholder = t.chatPlaceholder;
+      document.getElementById("chat-send-label").textContent = t.chatSendLabel;
+
+      document.getElementById("tile-orakel-title").textContent = t.tiles.orakelTitle;
+      document.getElementById("tile-orakel-desc").textContent = t.tiles.orakelDesc;
+      document.getElementById("tile-orakel-btn-text").textContent = t.tiles.orakelButton;
+
+      document.getElementById("tile-self-title").textContent = t.tiles.selfTitle;
+      document.getElementById("tile-self-desc").textContent = t.tiles.selfDesc;
+      document.getElementById("tile-self-btn-text").textContent = t.tiles.selfButton;
+
+      document.getElementById("tile-video-title").textContent = t.tiles.videoTitle;
+      document.getElementById("tile-video-desc").textContent = t.tiles.videoDesc;
+      document.getElementById("tile-video-btn-text").textContent = t.tiles.videoButton;
+
+      document
+        .querySelectorAll(".lang-btn")
+        .forEach((btn) => btn.classList.toggle("active", btn.dataset.lang === lang));
+    }
+
+    document.querySelectorAll(".lang-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setLanguage(btn.dataset.lang);
+      });
+    });
+
+    // Default language
+    setLanguage("de");
+  </script>
+</body>
 </html>
